@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrid Tax Issue Reporting System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-6 rounded-lg">
+    <h1 class="text-2xl font-semibold text-center text-blue-600 mb-8">Integrid Tax Issue Reporting System</h1>
+
+    <div class="form-container bg-white rounded-lg shadow-md p-8 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Report an Issue</h2>
+        <form id="issueForm" class="space-y-4">
+            <div>
+                <label for="period" class="block text-gray-700 text-sm font-bold mb-2">Period:</label>
+                <select id="period" name="period" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <option value="" disabled selected>Select Month</option>
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
+            </div>
+            <div>
+                <label for="company" class="block text-gray-700 text-sm font-bold mb-2">Company:</label>
+                <input type="text" id="company" name="company" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            </div>
+            <div>
+                <label for="question" class="block text-gray-700 text-sm font-bold mb-2">Question:</label>
+                <textarea id="question" name="question" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32 resize-y" required></textarea>
+            </div>
+            <div>
+                <label for="questionBy" class="block text-gray-700 text-sm font-bold mb-2">Question By (PIC):</label>
+                <select id="questionBy" name="questionBy" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <option value="" disabled selected>Select PIC</option>
+                    <option value="Esa">Esa</option>
+                    <option value="Bayu">Bayu</option>
+                    <option value="Kak Eko">Kak Eko</option>
+                    <option value="Eka">Eka</option>
+                </select>
+            </div>
+            <div>
+                <label for="attachment" class="block text-gray-700 text-sm font-bold mb-2">Question Attachment (Link):</label>
+                <input type="url" id="attachment" name="attachment" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Submit Issue</button>
+        </form>
+    </div>
+
+    <div class="filter-container bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Month</h2>
+        <select id="monthFilter" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            <option value="">All Months</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+        </select>
+    </div>
+
+    <div class="report-list-container bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Reported Issues</h2>
+        <div id="reportList" class="space-y-4">
+            <p>No issues reported yet.</p>
+        </div>
+    </div>
+
+    <div class="response-container bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Response</h2>
+        <div id="response" class="border rounded p-4 text-gray-700">
+            <p>Awaiting issue submission...</p>
+        </div>
+    </div>
+
+     <div class="answer-form-container bg-white rounded-lg shadow-md p-8 mt-6" style="display: none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Answer Issue</h2>
+        <form id="answerForm" class="space-y-4">
+            <div>
+                <label for="issueNumber" class="block text-gray-700 text-sm font-bold mb-2">Issue Number:</label>
+                <input type="text" id="issueNumber" name="issueNumber" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required readonly>
+            </div>
+            <div>
+                <label for="answer" class="block text-gray-700 text-sm font-bold mb-2">Answer:</label>
+                <textarea id="answer" name="answer" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required></textarea>
+            </div>
+            <div>
+                <label for="answerAttachment" class="block text-gray-700 text-sm font-bold mb-2">Answer Attachment (Link):</label>
+                <input type="url" id="answerAttachment" name="answerAttachment" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Submit Answer</button>
+            <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cancel-answer-form">Cancel</button>
+        </form>
+    </div>
+
+    <script>
+        let issues = []; // Array to store reported issues
+        let currentIssueNumber = 1;
+
+        document.getElementById('issueForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let formData = new FormData(this);
+            let responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = '<p class="text-gray-600">Loading...</p>';
+
+            // Simulate an asynchronous request (replace with actual fetch if you have a server)
+            setTimeout(function() {
+                let newIssue = {
+                    issueNumber: currentIssueNumber++, // Auto-number the issue
+                    period: formData.get('period'),
+                    company: formData.get('company'),
+                    question: formData.get('question'),
+                    questionBy: formData.get('questionBy'),
+                    attachment: formData.get('attachment'),
+                    answer: null, // Initialize answer as null
+                    answerAttachment: null,
+                    status: "NEW / OPEN" // Set default status
+                };
+
+                issues.push(newIssue); // Add the new issue to the array
+                updateReportList(); // Update the report list display
+                document.getElementById('issueForm').reset();
+
+                 // Update response div
+                displayResponse(newIssue.issueNumber);
+
+            }, 1500); // Simulate a 1.5 second delay
+        });
+
+        document.getElementById('monthFilter').addEventListener('change', function() {
+            updateReportList();
+        });
+
+        function updateReportList() {
+            let reportListDiv = document.getElementById('reportList');
+            let selectedMonth = document.getElementById('monthFilter').value;
+
+            if (issues.length === 0) {
+                reportListDiv.innerHTML = '<p>No issues reported yet.</p>';
+                return;
+            }
+
+            let filteredIssues = issues; // Start with all issues
+            if (selectedMonth) {
+                filteredIssues = issues.filter(issue => issue.period === selectedMonth);
+            }
+
+            let reportListHTML = filteredIssues.map((issue) => {
+                return `
+                    <div class="border rounded p-4 bg-gray-50 relative">
+                        <h3 class="font-semibold text-lg text-gray-700 mb-2">Issue #${issue.issueNumber}</h3>
+                        <p><span class="font-semibold">Period:</span> ${issue.period}</p>
+                        <p><span class="font-semibold">Company:</span> ${issue.company}</p>
+                        <p><span class="font-semibold">Question:</span> ${issue.question}</p>
+                        <p><span class="font-semibold">Question By (PIC):</span> ${issue.questionBy}</p>
+                        <p><span class="font-semibold">Question Attachment:</span> ${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="text-blue-500 hover:underline">${issue.attachment}</a>` : 'No attachment'}</p>
+                        <p><span class="font-semibold">Status:</span> <span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></p>
+                        ${issue.answer ? `<p class="mt-2"><span class="font-semibold">Answer:</span> ${issue.answer}</p>  <p class="mt-2"><span class="font-semibold">Answer Attachment:</span> ${issue.answerAttachment ? `<a href="${issue.answerAttachment}" target="_blank" class="text-blue-500 hover:underline">${issue.answerAttachment}</a>` : 'No attachment'}</p>` : `<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline absolute bottom-4 right-4 answer-button" data-issue-number="${issue.issueNumber}">Answer Issue</button>`}
+                    </div>
+                `;
+            }).join('');
+
+            reportListDiv.innerHTML = reportListHTML;
+
+            // Attach event listeners to the "Answer Issue" buttons
+            document.querySelectorAll('.answer-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const issueNumber = this.dataset.issueNumber;
+                    showAnswerForm(issueNumber);
+                });
+            });
+        }
+
+        function showAnswerForm(issueNumber) {
+            let answerFormContainer = document.querySelector('.answer-form-container');
+            let issueNumberInput = document.getElementById('issueNumber');
+            issueNumberInput.value = issueNumber;
+            answerFormContainer.style.display = 'block';
+
+             // Find the issue in the array
+            const issueToAnswer = issues.find(issue => issue.issueNumber === parseInt(issueNumber));
+            if (issueToAnswer) {
+                document.getElementById('answer').value = issueToAnswer.answer || '';
+                document.getElementById('answerAttachment').value = issueToAnswer.answerAttachment || '';
+            }
+
+        }
+
+        document.querySelector('.cancel-answer-form').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('.answer-form-container').style.display = 'none';
+            document.getElementById('answerForm').reset();
+        });
+
+        document.getElementById('answerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let issueNumber = parseInt(document.getElementById('issueNumber').value);
+            let answer = document.getElementById('answer').value;
+            let answerAttachment = document.getElementById('answerAttachment').value;
+
+            // Simulate sending answer to server
+             setTimeout(function() {
+                // Find the issue in the array and update the answer
+                const issueToUpdate = issues.find(issue => issue.issueNumber === issueNumber);
+                if (issueToUpdate) {
+                    issueToUpdate.answer = answer;
+                    issueToUpdate.answerAttachment = answerAttachment;
+                    issueToUpdate.status = "ANSWERED"; // Update status
+                }
+                updateReportList(); // Update the report list
+                document.querySelector('.answer-form-container').style.display = 'none';
+                document.getElementById('answerForm').reset();
+                displayResponse(issueNumber);
+            }, 1000);
+        });
+
+        function getStatusColor(status) {
+            switch (status) {
+                case "NEW / OPEN": return "bg-yellow-200 text-yellow-700";
+                case "ANSWERED": return "bg-green-200 text-green-700";
+                case "CLOSED": return "bg-gray-200 text-gray-700";
+                default: return "bg-gray-200 text-gray-700";
+            }
+        }
+
+        function displayResponse(issueNumber) {
+            let responseDiv = document.getElementById('response');
+            const issue = issues.find(i => i.issueNumber === issueNumber);
+
+             if (issue) {
+                responseDiv.innerHTML = `<div class="mb-4">
+                        <p><span class="font-semibold">Issue Number:</span> ${issue.issueNumber}</p>
+                        <p><span class="font-semibold">Period:</span> ${issue.period}</p>
+                        <p><span class="font-semibold">Company:</span> ${issue.company}</p>
+                        <p><span class="font-semibold">Question:</span> ${issue.question}</p>
+                        <p><span class="font-semibold">Question By (PIC):</span> ${issue.questionBy}</p>
+                        <p><span class="font-semibold">Question Attachment:</span> ${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="text-blue-500 hover:underline">${issue.attachment}</a>` : 'No attachment'}</p>
+                    </div>
+                    <div class="mb-4 border-t border-gray-200 pt-4">
+                        <p><span class="font-semibold">Answer:</span> ${issue.answer ? issue.answer : 'Awaiting Answer'}</p>
+                         <p><span class="font-semibold">Answer Attachment:</span> ${issue.answerAttachment ? `<a href="${issue.answerAttachment}" target="_blank" class="text-blue-500 hover:underline">${issue.answerAttachment}</a>` : 'No attachment'}</p>
+                    </div>
+                    <div class="mb-4 border-t border-gray-200 pt-4">
+                        <p><span class="font-semibold">Status:</span> <span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></p>
+                    </div>`;
+             } else {
+                 responseDiv.innerHTML = `<p>No issue found with issue number ${issueNumber}</p>`;
+             }
+        }
+    </script>
+</body>
+</html>
