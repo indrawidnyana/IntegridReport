@@ -10,10 +10,41 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+        .table-container {
+            overflow-x: auto; /* Enable horizontal scrolling for small screens */
+            margin-bottom: 20px;
+        }
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .table-responsive table {
+            min-width: 800px; /* Ensure table doesn't get too narrow on wide screens */
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-6 rounded-lg">
-    <h1 class="text-2xl font-semibold text-center text-blue-600 mb-8">Integrid Tax Issue Reporting System</h1>
+    <h1 class="text-4xl font-bold text-center text-blue-600 mb-8 border-2 border-blue-400 rounded-md p-4">Integrid Tax Issue Reporting System</h1>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8 border-2 border-gray-300">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 underline">Important Information</h2>
+        <ol class="list-decimal list-inside space-y-2">
+            <li class="flex items-start">
+                <span class="font-semibold mr-1">PLEASE UPLOAD THE QUESTION ATTACHMENT FILE ON THIS DRIVE :</span> 
+                    <a href="https://drive.google.com/drive/folders/1TtYH6e1c3nIP-uHX_mPEqcVKIjNr2-iT?usp=drive_link" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">
+                        Here
+                    </a>
+                
+            </li>
+            <li class="flex items-start">
+                <span class="font-semibold mr-1">PLEASE UPLOAD THE ANSWER ATTACHMENT FILE ON THIS DRIVE :</span>
+                    <a href="https://drive.google.com/drive/folders/1ihFleQ0ONU4S9C-cjmlkJZov1RuvYjvk?usp=drive_link" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">
+                        Here
+                    </a>
+                
+            </li>
+        </ol>
+    </div>
 
     <div class="form-container bg-white rounded-lg shadow-md p-8 mb-6">
         <h2 class="text-xl font-semibold text-gray-800 mb-6">Report an Issue</h2>
@@ -83,7 +114,7 @@
 
     <div class="report-list-container bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 class="text-xl font-semibold text-gray-800 mb-4">Reported Issues</h2>
-        <div id="reportList" class="space-y-4">
+        <div id="reportList" class="table-responsive">
             <p>No issues reported yet.</p>
         </div>
     </div>
@@ -168,20 +199,44 @@
                 filteredIssues = issues.filter(issue => issue.period === selectedMonth);
             }
 
-            let reportListHTML = filteredIssues.map((issue) => {
-                return `
-                    <div class="border rounded p-4 bg-gray-50 relative">
-                        <h3 class="font-semibold text-lg text-gray-700 mb-2">Issue #${issue.issueNumber}</h3>
-                        <p><span class="font-semibold">Period:</span> ${issue.period}</p>
-                        <p><span class="font-semibold">Company:</span> ${issue.company}</p>
-                        <p><span class="font-semibold">Question:</span> ${issue.question}</p>
-                        <p><span class="font-semibold">Question By (PIC):</span> ${issue.questionBy}</p>
-                        <p><span class="font-semibold">Question Attachment:</span> ${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="text-blue-500 hover:underline">${issue.attachment}</a>` : 'No attachment'}</p>
-                        <p><span class="font-semibold">Status:</span> <span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></p>
-                        ${issue.answer ? `<p class="mt-2"><span class="font-semibold">Answer:</span> ${issue.answer}</p>  <p class="mt-2"><span class="font-semibold">Answer Attachment:</span> ${issue.answerAttachment ? `<a href="${issue.answerAttachment}" target="_blank" class="text-blue-500 hover:underline">${issue.answerAttachment}</a>` : 'No attachment'}</p>` : `<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline absolute bottom-4 right-4 answer-button" data-issue-number="${issue.issueNumber}">Answer Issue</button>`}
-                    </div>
-                `;
-            }).join('');
+            let reportListHTML = `<div class="table-responsive">
+                <table class="min-w-full border-collapse border border-gray-300">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Issue #</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Period</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Company</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Question</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Question By (PIC)</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Attachment</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Status</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Answer</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Answer Attachment</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        ${filteredIssues.map((issue) => {
+                            return `
+                                <tr>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.issueNumber}</td>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.period}</td>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.company}</td>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.question}</td>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.questionBy}</td>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</td>
+                                     <td class="px-4 py-2 border border-gray-300"><span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></td>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.answer ? issue.answer : 'Awaiting Answer'}</td>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.answerAttachment ? `<a href="${issue.answerAttachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</td>
+                                    <td class="px-4 py-2 border border-gray-300">
+                                        ${issue.answer ? '' : `<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline answer-button" data-issue-number="${issue.issueNumber}">Answer Issue</button>`}
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>`;
 
             reportListDiv.innerHTML = reportListHTML;
 
@@ -258,11 +313,11 @@
                         <p><span class="font-semibold">Company:</span> ${issue.company}</p>
                         <p><span class="font-semibold">Question:</span> ${issue.question}</p>
                         <p><span class="font-semibold">Question By (PIC):</span> ${issue.questionBy}</p>
-                        <p><span class="font-semibold">Question Attachment:</span> ${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="text-blue-500 hover:underline">${issue.attachment}</a>` : 'No attachment'}</p>
+                        <p><span class="font-semibold">Question Attachment:</span> ${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</p>
                     </div>
                     <div class="mb-4 border-t border-gray-200 pt-4">
                         <p><span class="font-semibold">Answer:</span> ${issue.answer ? issue.answer : 'Awaiting Answer'}</p>
-                         <p><span class="font-semibold">Answer Attachment:</span> ${issue.answerAttachment ? `<a href="${issue.answerAttachment}" target="_blank" class="text-blue-500 hover:underline">${issue.answerAttachment}</a>` : 'No attachment'}</p>
+                         <p><span class="font-semibold">Answer Attachment:</span> ${issue.answerAttachment ? `<a href="${issue.answerAttachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</p>
                     </div>
                     <div class="mb-4 border-t border-gray-200 pt-4">
                         <p><span class="font-semibold">Status:</span> <span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></p>
