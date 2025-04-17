@@ -21,10 +21,60 @@
         .table-responsive table {
             min-width: 800px; /* Ensure table doesn't get too narrow on wide screens */
         }
+        /* Style for the dropdown options */
+        .select-wrapper select {
+            /* A reset of the default select box styles */
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 100%;
+            padding: 0.75rem 2.5rem 0.75rem 0.75rem; /* Padding to leave space for the arrow */
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            outline: none;
+            font-size: 1rem;
+            color: #4b5563;
+            background-color: #fff;
+            cursor: pointer;
+            transition: border-color 0.15s ease-in-out, shadow-sm 0.15s ease-in-out;
+        }
+
+        .select-wrapper select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Custom dropdown arrow */
+        .select-wrapper::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            width: 0.625rem;
+            height: 0.625rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-size: 1rem;
+            background-repeat: no-repeat;
+            pointer-events: none; /* Ensure the arrow doesn't interfere with clicks */
+        }
+
+        /* Style for the dropdown options */
+        .select-wrapper select option {
+            padding: 0.75rem;
+            font-size: 1rem;
+            color: #4b5563;
+            background-color: #fff;
+        }
+
+        .select-wrapper select option:hover,
+        .select-wrapper select option:checked {
+            background-color: #f0f0f0;
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-6 rounded-lg">
-    <h1 class="text-4xl font-bold text-center text-blue-600 mb-8 border-2 border-blue-400 rounded-md p-4">Integrid Tax Issue Reporting System</h1>
+    <h1 class="text-4xl font-bold text-center text-blue-700 mb-8 border-2 border-blue-400 rounded-md p-4">Integrid Tax Issue Reporting System</h1>
 
     <div class="bg-white rounded-lg shadow-md p-6 mb-8 border-2 border-gray-300">
         <h2 class="text-xl font-semibold text-gray-800 mb-4 underline">Important Information</h2>
@@ -69,7 +119,112 @@
             </div>
             <div>
                 <label for="company" class="block text-gray-700 text-sm font-bold mb-2">Company:</label>
-                <input type="text" id="company" name="company" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                <div class="select-wrapper relative">
+                    <!-- Searchable Dropdown -->
+                    <input type="text" id="companySearch" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2" placeholder="Search Company..." autocomplete="off" oninput="filterCompanies()">
+                    
+                    <select id="company" name="company" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <option value="" disabled selected>Select Company</option>
+                        <option value="The Bluejay">The Bluejay</option>
+                        <option value="Barong Family">Barong Family</option>
+                        <option value="Sababa - Elno Noli Putih">Sababa - Elno Noli Putih</option>
+                        <option value="Karisa Lifestyle">Karisa Lifestyle</option>
+                        <option value="Indah Nusa Timur">Indah Nusa Timur</option>
+                        <option value="INTEGRID">INTEGRID</option>
+                        <option value="Gelareh Design">Gelareh Design</option>
+                        <option value="Sunkiss Restaurant">Sunkiss Restaurant</option>
+                        <option value="Rent Surfboard Bali">Rent Surfboard Bali</option>
+                        <option value="Improvea Maju Solusi">Improvea Maju Solusi</option>
+                        <option value="Trio Rukun Sejahtera">Trio Rukun Sejahtera</option>
+                        <option value="Ola Casa Bali">Ola Casa Bali</option>
+                        <option value="Moonkey Group">Moonkey Group</option>
+                        <option value="Aneka Pangan Sejahtera (CIBO)">Aneka Pangan Sejahtera (CIBO)</option>
+                        <option value="Liva">Liva</option>
+                        <option value="You Spa Bali">You Spa Bali</option>
+                        <option value="Pemandangan HIjau Bali">Pemandangan HIjau Bali</option>
+                        <option value="Kayu Living Bali">Kayu Living Bali</option>
+                        <option value="Serenity Property Bali">Serenity Property Bali</option>
+                        <option value="Weddingup Event Organizer">Weddingup Event Organizer</option>
+                        <option value="Bienaime Samyn Investment">Bienaime Samyn Investment</option>
+                        <option value="Bali Couple Retreats">Bali Couple Retreats</option>
+                        <option value="Denpasar Indah Seruni">Denpasar Indah Seruni</option>
+                        <option value="Maza Bali Investing">Maza Bali Investing</option>
+                        <option value="Martin Family Agency">Martin Family Agency</option>
+                        <option value="Masa Depan Utama Lestari">Masa Depan Utama Lestari</option>
+                        <option value="Sportva">Sportva</option>
+                        <option value="JGM Group Management">JGM Group Management</option>
+                        <option value="Naoli Eliam Group">Naoli Eliam Group</option>
+                        <option value="Evasion Villa Bali">Evasion Villa Bali</option>
+                        <option value="Pauline & Luke Consulting">Pauline & Luke Consulting</option>
+                        <option value="Bali Real Estate - Anjuna Bay">Bali Real Estate - Anjuna Bay</option>
+                        <option value="HMZ Digital Agency">HMZ Digital Agency</option>
+                        <option value="Shade Agency Bali">Shade Agency Bali</option>
+                        <option value="Mid Night Sun">Mid Night Sun</option>
+                        <option value="Neala Nature Stays">Neala Nature Stays</option>
+                        <option value="Deprince Global Services">Deprince Global Services</option>
+                        <option value="Lucky Cat Land">Lucky Cat Land</option>
+                        <option value="Only Loading Asia">Only Loading Asia</option>
+                        <option value="Women Bali Bahagia">Women Bali Bahagia</option>
+                        <option value="Sunder Jupiter Bali">Sunder Jupiter Bali</option>
+                        <option value="Aanoukis Tropix Retail">Aanoukis Tropix Retail</option>
+                        <option value="Bybali Build Consulting">Bybali Build Consulting</option>
+                        <option value="Snaaack Padang Bai">Snaaack Padang Bai</option>
+                        <option value="The Naluri Bali">The Naluri Bali</option>
+                        <option value="Hocus Pocus Prod">Hocus Pocus Prod</option>
+                        <option value="Kim Advantage Consulting">Kim Advantage Consulting</option>
+                        <option value="Bejoi Design Bali">Bejoi Design Bali</option>
+                        <option value="Nyata Consulting Bali">Nyata Consulting Bali</option>
+                        <option value="Tran Manh Sung">Tran Manh Sung</option>
+                        <option value="The Blackless Lovers">The Blackless Lovers</option>
+                        <option value="Maju Operation & Development">Maju Operation & Development</option>
+                        <option value="Dragon Indonesia Exotics">Dragon Indonesia Exotics</option>
+                        <option value="Elodie Mattei Group">Elodie Mattei Group</option>
+                        <option value="Chatelain Advisory Investment">Chatelain Advisory Investment</option>
+                        <option value="Cabana Bali Style">Cabana Bali Style</option>
+                        <option value="Good Move">Good Move</option>
+                        <option value="Slow Nomad Living">Slow Nomad Living</option>
+                        <option value="The Agency Bali">The Agency Bali</option>
+                        <option value="Esensi Digital Agency">Esensi Digital Agency</option>
+                        <option value="LNH Reality and Flavor">LNH Reality and Flavor</option>
+                        <option value="MYMS">MYMS</option>
+                        <option value="Modern Groove Reverie">Modern Groove Reverie</option>
+                        <option value="PT. LUNES SACREES BALI">PT. LUNES SACREES BALI</option>
+                        <option value="PT. JOY BIRD INVEST">PT. JOY BIRD INVEST</option>
+                        <option value="PT. WEAREBRAND PRODUCTION DIGITAL">PT. WEAREBRAND PRODUCTION DIGITAL</option>
+                        <option value="PT. BEBAS EXPERIENCE GROUP">PT. BEBAS EXPERIENCE GROUP</option>
+                        <option value="PT. THE SUNRISE PRODUCTION">PT. THE SUNRISE PRODUCTION</option>
+                        <option value="THE BACKLESS LOVERS">THE BACKLESS LOVERS</option>
+                        <option value="PT THE CENTURY GROUP">PT THE CENTURY GROUP</option>
+                        <option value="BALI ISLAND BOUNCE">BALI ISLAND BOUNCE </option>
+                        <option value="PT BALI JADAYO IMMO">PT BALI JADAYO IMMO</option>
+                        <option value="PT DEL VALLE GURRUTXAGA">PT DEL VALLE GURRUTXAGA</option>
+                        <option value="PT THE SURFER GUIDE BALI">PT THE SURFER GUIDE BALI</option>
+                        <option value="PT CALA BALI INVESTMENT">PT CALA BALI INVESTMENT</option>
+                        <option value="PT LEREGARD PRO BALI">PT LEREGARD PRO BALI</option>
+                        <option value="PT CHUNK THE FUTURE">PT CHUNK THE FUTURE</option>
+                        <option value="PT THE BALI PARADIS">PT THE BALI PARADIS</option>
+                        <option value="PT SEA YOU BALI">PT SEA YOU BALI</option>
+                        <option value="THE DOG PARADISE">THE DOG PARADISE</option>
+                    </select>
+                </div>
+                
+                <script>
+                    // Add search functionality to filter the dropdown
+                    function filterCompanies() {
+                        let input = document.getElementById('companySearch');
+                        let filter = input.value.toLowerCase();
+                        let options = document.getElementById('company').options;
+                
+                        for (let i = 0; i < options.length; i++) {
+                            let option = options[i];
+                            if (option.text.toLowerCase().includes(filter)) {
+                                option.style.display = ""; // Show option if it matches
+                            } else {
+                                option.style.display = "none"; // Hide option if it doesn't match
+                            }
+                        }
+                    }
+                </script>
             </div>
             <div>
                 <label for="question" class="block text-gray-700 text-sm font-bold mb-2">Question:</label>
