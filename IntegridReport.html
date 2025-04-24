@@ -585,7 +585,7 @@
         // Delete an issue
         async function deleteIssue(issueId, issueNumber) {
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('tax_issues')
                     .delete()
                     .eq('id', issueId);
