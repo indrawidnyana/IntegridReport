@@ -6,12 +6,14 @@
     <title>Integrid Tax Issue Reporting System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
         .table-container {
-            overflow-x: auto; /* Enable horizontal scrolling for small screens */
+            overflow-x: auto;
             margin-bottom: 20px;
         }
         .table-responsive {
@@ -19,16 +21,14 @@
             overflow-x: auto;
         }
         .table-responsive table {
-            min-width: 800px; /* Ensure table doesn't get too narrow on wide screens */
+            min-width: 800px;
         }
-        /* Style for the dropdown options */
         .select-wrapper select {
-            /* A reset of the default select box styles */
             appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
             width: 100%;
-            padding: 0.75rem 2.5rem 0.75rem 0.75rem; /* Padding to leave space for the arrow */
+            padding: 0.75rem 2.5rem 0.75rem 0.75rem;
             border-radius: 0.375rem;
             border: 1px solid #d1d5db;
             outline: none;
@@ -44,7 +44,6 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
 
-        /* Custom dropdown arrow */
         .select-wrapper::after {
             content: "";
             position: absolute;
@@ -56,10 +55,9 @@
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
             background-size: 1rem;
             background-repeat: no-repeat;
-            pointer-events: none; /* Ensure the arrow doesn't interfere with clicks */
+            pointer-events: none;
         }
 
-        /* Style for the dropdown options */
         .select-wrapper select option {
             padding: 0.75rem;
             font-size: 1rem;
@@ -70,6 +68,21 @@
         .select-wrapper select option:hover,
         .select-wrapper select option:checked {
             background-color: #f0f0f0;
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #3b82f6;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -268,9 +281,22 @@
     </div>
 
     <div class="report-list-container bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Reported Issues</h2>
+        <div class="flex justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-800">Reported Issues</h2>
+            <div>
+                <button id="exportButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2">
+                    Export Data to CSV
+                </button>
+                <button id="refreshButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Refresh Data
+                </button>
+            </div>
+        </div>
         <div id="reportList" class="table-responsive">
-            <p>No issues reported yet.</p>
+            <div class="flex justify-center items-center h-24">
+                <div class="spinner"></div>
+                <p class="ml-3">Loading data...</p>
+            </div>
         </div>
     </div>
 
@@ -284,62 +310,165 @@
      <div class="answer-form-container bg-white rounded-lg shadow-md p-8 mt-6" style="display: none;">
         <h2 class="text-xl font-semibold text-gray-800 mb-6">Answer Issue</h2>
         <form id="answerForm" class="space-y-4">
+            <input type="hidden" id="issueId" name="issueId">
             <div>
                 <label for="issueNumber" class="block text-gray-700 text-sm font-bold mb-2">Issue Number:</label>
                 <input type="text" id="issueNumber" name="issueNumber" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required readonly>
             </div>
             <div>
                 <label for="answer" class="block text-gray-700 text-sm font-bold mb-2">Answer:</label>
-                <textarea id="answer" name="answer" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required></textarea>
+                <textarea id="answer" name="answer" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32 resize-y" required></textarea>
             </div>
             <div>
                 <label for="answerAttachment" class="block text-gray-700 text-sm font-bold mb-2">Answer Attachment (Link):</label>
                 <input type="url" id="answerAttachment" name="answerAttachment" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
-            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Submit Answer</button>
-            <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cancel-answer-form">Cancel</button>
+            <div class="flex justify-between">
+                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Submit Answer</button>
+                <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cancel-answer-form">Cancel</button>
+            </div>
         </form>
     </div>
 
     <script>
-        let issues = []; // Array to store reported issues
-        let currentIssueNumber = 1;
+        // Initialize Supabase client
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // Replace with your Supabase URL
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Replace with your Supabase anon key
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Initialize variables
+        let issues = [];
+        
+        // Load data when the page is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            loadIssues();
+            
+            // Add event listeners for buttons
+            document.getElementById('exportButton').addEventListener('click', exportToCSV);
+            document.getElementById('refreshButton').addEventListener('click', loadIssues);
+        });
 
-        document.getElementById('issueForm').addEventListener('submit', function(e) {
+        // Load issues from Supabase
+        async function loadIssues() {
+            showLoading();
+            
+            try {
+                // Fetch issues from Supabase
+                const { data, error } = await supabase
+                    .from('tax_issues')
+                    .select('*')
+                    .order('issue_number', { ascending: true });
+                
+                if (error) throw error;
+                
+                issues = data || [];
+                updateReportList();
+            } catch (error) {
+                console.error('Error loading issues:', error);
+                document.getElementById('reportList').innerHTML = `
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <span class="block sm:inline"> Failed to load issues. Please try again later.</span>
+                    </div>
+                `;
+            }
+        }
+        
+        // Show loading indicator
+        function showLoading() {
+            document.getElementById('reportList').innerHTML = `
+                <div class="flex justify-center items-center h-24">
+                    <div class="spinner"></div>
+                    <p class="ml-3">Loading data...</p>
+                </div>
+            `;
+        }
+
+        // Handle issue form submission
+        document.getElementById('issueForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-
+            
+            // Disable submit button and show loading state
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="flex items-center justify-center"><div class="spinner mr-2" style="width: 20px; height: 20px;"></div>Submitting...</span>';
+            
             let formData = new FormData(this);
             let responseDiv = document.getElementById('response');
-            responseDiv.innerHTML = '<p class="text-gray-600">Loading...</p>';
-
-            // Simulate an asynchronous request (replace with actual fetch if you have a server)
-            setTimeout(function() {
-                let newIssue = {
-                    issueNumber: currentIssueNumber++, // Auto-number the issue
+            responseDiv.innerHTML = '<p class="text-gray-600">Submitting issue...</p>';
+            
+            try {
+                // Get the highest issue number to determine the next one
+                const { data: maxIssueNumber, error: maxError } = await supabase
+                    .from('tax_issues')
+                    .select('issue_number')
+                    .order('issue_number', { ascending: false })
+                    .limit(1);
+                
+                if (maxError) throw maxError;
+                
+                const nextIssueNumber = maxIssueNumber && maxIssueNumber.length > 0 
+                    ? maxIssueNumber[0].issue_number + 1 
+                    : 1;
+                
+                // Create new issue object
+                const newIssue = {
+                    issue_number: nextIssueNumber,
                     period: formData.get('period'),
                     company: formData.get('company'),
                     question: formData.get('question'),
-                    questionBy: formData.get('questionBy'),
-                    attachment: formData.get('attachment'),
-                    answer: null, // Initialize answer as null
-                    answerAttachment: null,
-                    status: "NEW / OPEN" // Set default status
+                    question_by: formData.get('questionBy'),
+                    attachment: formData.get('attachment') || null,
+                    status: "NEW / OPEN",
+                    answer: null,
+                    answer_attachment: null
                 };
-
-                issues.push(newIssue); // Add the new issue to the array
-                updateReportList(); // Update the report list display
-                document.getElementById('issueForm').reset();
-
-                 // Update response div
-                displayResponse(newIssue.issueNumber);
-
-            }, 1500); // Simulate a 1.5 second delay
+                
+                // Insert the new issue into Supabase
+                const { data, error } = await supabase
+                    .from('tax_issues')
+                    .insert([newIssue])
+                    .select();
+                
+                if (error) throw error;
+                
+                // Reset form and reload issues
+                this.reset();
+                await loadIssues();
+                
+                // Display success response
+                displayResponse(nextIssueNumber);
+                
+                // Show success message
+                responseDiv.innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <strong class="font-bold">Success!</strong>
+                        <span class="block sm:inline"> Issue #${nextIssueNumber} has been created.</span>
+                    </div>
+                    ${responseDiv.innerHTML}
+                `;
+            } catch (error) {
+                console.error('Error submitting issue:', error);
+                responseDiv.innerHTML = `
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <span class="block sm:inline"> Failed to submit issue. Please try again later.</span>
+                    </div>
+                `;
+            } finally {
+                // Re-enable submit button
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            }
         });
 
+        // Filter issues by month
         document.getElementById('monthFilter').addEventListener('change', function() {
             updateReportList();
         });
 
+        // Update the report list display
         function updateReportList() {
             let reportListDiv = document.getElementById('reportList');
             let selectedMonth = document.getElementById('monthFilter').value;
@@ -374,17 +503,22 @@
                         ${filteredIssues.map((issue) => {
                             return `
                                 <tr>
-                                    <td class="px-4 py-2 border border-gray-300">${issue.issueNumber}</td>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.issue_number}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.period}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.company}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.question}</td>
-                                    <td class="px-4 py-2 border border-gray-300">${issue.questionBy}</td>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.question_by}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</td>
                                      <td class="px-4 py-2 border border-gray-300"><span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.answer ? issue.answer : 'Awaiting Answer'}</td>
-                                    <td class="px-4 py-2 border border-gray-300">${issue.answerAttachment ? `<a href="${issue.answerAttachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</td>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</td>
                                     <td class="px-4 py-2 border border-gray-300">
-                                        ${issue.answer ? '' : `<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline answer-button" data-issue-number="${issue.issueNumber}">Answer Issue</button>`}
+                                        ${issue.answer ? 
+                                          `<button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-2 edit-answer-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Edit Answer</button>
+                                           <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline delete-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Delete</button>` 
+                                        : 
+                                          `<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-2 answer-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Answer Issue</button>
+                                           <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline delete-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Delete</button>`}
                                     </td>
                                 </tr>
                             `;
@@ -395,59 +529,147 @@
 
             reportListDiv.innerHTML = reportListHTML;
 
-            // Attach event listeners to the "Answer Issue" buttons
-            document.querySelectorAll('.answer-button').forEach(button => {
+            // Attach event listeners to the buttons
+            document.querySelectorAll('.answer-button, .edit-answer-button').forEach(button => {
                 button.addEventListener('click', function() {
-                    const issueNumber = this.dataset.issueNumber;
-                    showAnswerForm(issueNumber);
+                    const issueId = this.dataset.id;
+                    const issueNumber = parseInt(this.dataset.issueNumber);
+                    showAnswerForm(issueId, issueNumber);
+                });
+            });
+            
+            // Add event listeners for delete buttons
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const issueId = this.dataset.id;
+                    const issueNumber = parseInt(this.dataset.issueNumber);
+                    if (confirm(`Are you sure you want to delete issue #${issueNumber}? This cannot be undone.`)) {
+                        deleteIssue(issueId, issueNumber);
+                    }
                 });
             });
         }
 
-        function showAnswerForm(issueNumber) {
-            let answerFormContainer = document.querySelector('.answer-form-container');
-            let issueNumberInput = document.getElementById('issueNumber');
-            issueNumberInput.value = issueNumber;
-            answerFormContainer.style.display = 'block';
-
-             // Find the issue in the array
-            const issueToAnswer = issues.find(issue => issue.issueNumber === parseInt(issueNumber));
-            if (issueToAnswer) {
-                document.getElementById('answer').value = issueToAnswer.answer || '';
-                document.getElementById('answerAttachment').value = issueToAnswer.answerAttachment || '';
+        // Delete an issue
+        async function deleteIssue(issueId, issueNumber) {
+            try {
+                const { error } = await supabase
+                    .from('tax_issues')
+                    .delete()
+                    .eq('id', issueId);
+                
+                if (error) throw error;
+                
+                // Reload issues after deletion
+                await loadIssues();
+                
+                // Update response div
+                document.getElementById('response').innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Success!</strong>
+                        <span class="block sm:inline"> Issue #${issueNumber} has been deleted.</span>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error deleting issue:', error);
+                document.getElementById('response').innerHTML = `
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <span class="block sm:inline"> Failed to delete issue. Please try again later.</span>
+                    </div>
+                `;
             }
-
         }
 
+        // Show answer form
+        function showAnswerForm(issueId, issueNumber) {
+            let answerFormContainer = document.querySelector('.answer-form-container');
+            
+            // Set issue ID and number
+            document.getElementById('issueId').value = issueId;
+            document.getElementById('issueNumber').value = issueNumber;
+            
+            // Find the issue in the array
+            const issueToAnswer = issues.find(issue => issue.id === issueId);
+            if (issueToAnswer) {
+                document.getElementById('answer').value = issueToAnswer.answer || '';
+                document.getElementById('answerAttachment').value = issueToAnswer.answer_attachment || '';
+            }
+            
+            answerFormContainer.style.display = 'block';
+        }
+
+        // Handle cancel button on answer form
         document.querySelector('.cancel-answer-form').addEventListener('click', function(e) {
             e.preventDefault();
             document.querySelector('.answer-form-container').style.display = 'none';
             document.getElementById('answerForm').reset();
         });
 
-        document.getElementById('answerForm').addEventListener('submit', function(e) {
+        // Handle answer form submission
+        document.getElementById('answerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-
-            let issueNumber = parseInt(document.getElementById('issueNumber').value);
-            let answer = document.getElementById('answer').value;
-            let answerAttachment = document.getElementById('answerAttachment').value;
-
-            // Simulate sending answer to server
-             setTimeout(function() {
-                // Find the issue in the array and update the answer
-                const issueToUpdate = issues.find(issue => issue.issueNumber === issueNumber);
-                if (issueToUpdate) {
-                    issueToUpdate.answer = answer;
-                    issueToUpdate.answerAttachment = answerAttachment;
-                    issueToUpdate.status = "ANSWERED"; // Update status
-                }
-                updateReportList(); // Update the report list
+            
+            // Disable submit button and show loading state
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="flex items-center justify-center"><div class="spinner mr-2" style="width: 20px; height: 20px;"></div>Submitting...</span>';
+            
+            const issueId = document.getElementById('issueId').value;
+            const issueNumber = parseInt(document.getElementById('issueNumber').value);
+            const answer = document.getElementById('answer').value;
+            const answerAttachment = document.getElementById('answerAttachment').value || null;
+            
+            try {
+                // Update the issue in Supabase
+                const { data, error } = await supabase
+                    .from('tax_issues')
+                    .update({ 
+                        answer: answer,
+                        answer_attachment: answerAttachment,
+                        status: "ANSWERED",
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', issueId)
+                    .select();
+                
+                if (error) throw error;
+                
+                // Reload issues
+                await loadIssues();
+                
+                // Hide the form
                 document.querySelector('.answer-form-container').style.display = 'none';
                 document.getElementById('answerForm').reset();
+                
+                // Display updated issue
                 displayResponse(issueNumber);
-            }, 1000);
+                
+                // Show success message
+                document.getElementById('response').innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <strong class="font-bold">Success!</strong>
+                        <span class="block sm:inline"> Answer for issue #${issueNumber} has been submitted.</span>
+                    </div>
+                    ${document.getElementById('response').innerHTML}
+                `;
+            } catch (error) {
+                console.error('Error submitting answer:', error);
+                document.getElementById('response').innerHTML = `
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <span class="block sm:inline"> Failed to submit answer. Please try again later.</span>
+                    </div>
+                `;
+            } finally {
+                // Re-enable submit button
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            }
         });
 
+        // Get status color class
         function getStatusColor(status) {
             switch (status) {
                 case "NEW / OPEN": return "bg-yellow-200 text-yellow-700";
@@ -457,29 +679,89 @@
             }
         }
 
+        // Display issue details in response area
         function displayResponse(issueNumber) {
             let responseDiv = document.getElementById('response');
-            const issue = issues.find(i => i.issueNumber === issueNumber);
+            const issue = issues.find(i => i.issue_number === issueNumber);
 
-             if (issue) {
+            if (issue) {
                 responseDiv.innerHTML = `<div class="mb-4">
-                        <p><span class="font-semibold">Issue Number:</span> ${issue.issueNumber}</p>
+                        <p><span class="font-semibold">Issue Number:</span> ${issue.issue_number}</p>
                         <p><span class="font-semibold">Period:</span> ${issue.period}</p>
                         <p><span class="font-semibold">Company:</span> ${issue.company}</p>
                         <p><span class="font-semibold">Question:</span> ${issue.question}</p>
-                        <p><span class="font-semibold">Question By (PIC):</span> ${issue.questionBy}</p>
+                        <p><span class="font-semibold">Question By (PIC):</span> ${issue.question_by}</p>
                         <p><span class="font-semibold">Question Attachment:</span> ${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</p>
                     </div>
                     <div class="mb-4 border-t border-gray-200 pt-4">
                         <p><span class="font-semibold">Answer:</span> ${issue.answer ? issue.answer : 'Awaiting Answer'}</p>
-                         <p><span class="font-semibold">Answer Attachment:</span> ${issue.answerAttachment ? `<a href="${issue.answerAttachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</p>
+                        <p><span class="font-semibold">Answer Attachment:</span> ${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</p>
                     </div>
                     <div class="mb-4 border-t border-gray-200 pt-4">
                         <p><span class="font-semibold">Status:</span> <span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></p>
                     </div>`;
-             } else {
-                 responseDiv.innerHTML = `<p>No issue found with issue number ${issueNumber}</p>`;
-             }
+            } else {
+                responseDiv.innerHTML = `<p>No issue found with issue number ${issueNumber}</p>`;
+            }
+        }
+        
+        // Export data to CSV
+        function exportToCSV() {
+            if (issues.length === 0) {
+                alert('No data to export');
+                return;
+            }
+            
+            // Define CSV headers
+            const headers = [
+                'Issue #',
+                'Period',
+                'Company',
+                'Question',
+                'Question By (PIC)',
+                'Attachment',
+                'Status',
+                'Answer',
+                'Answer Attachment',
+                'Date Created',
+                'Date Updated'
+            ];
+            
+            // Map issues to CSV rows
+            const rows = issues.map(issue => [
+                issue.issue_number,
+                issue.period,
+                issue.company,
+                issue.question,
+                issue.question_by,
+                issue.attachment || '',
+                issue.status,
+                issue.answer || '',
+                issue.answer_attachment || '',
+                new Date(issue.created_at).toLocaleString(),
+                issue.updated_at ? new Date(issue.updated_at).toLocaleString() : ''
+            ]);
+            
+            // Combine headers and rows
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+            ].join('\n');
+            
+            // Create a Blob and download link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            
+            // Set download attributes
+            link.setAttribute('href', url);
+            link.setAttribute('download', `tax_issues_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.display = 'none';
+            
+            // Append to body, trigger click, and clean up
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
