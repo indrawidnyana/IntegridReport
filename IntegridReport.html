@@ -38,11 +38,13 @@
             align-items: center;
             width: 100%;
             padding: 10px 15px;
-            background-color: #0D9F6F; /* Green color as in your image */
-            color: white;
-            border: none;
+            background-color: white; /* Changed to white */
+            color: #4b5563; /* Text color changed to gray */
+            border: 1px solid #d1d5db; /* Added border */
+            border-radius: 0.375rem;
             cursor: pointer;
             text-align: left;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
         
         .dropdown-content {
@@ -53,6 +55,8 @@
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 10;
             border: 1px solid #f1f1f1;
+            border-radius: 0.375rem;
+            margin-top: 2px;
         }
         
         .dropdown-content.show {
@@ -136,21 +140,22 @@
         <form id="issueForm" class="space-y-4">
             <div>
                 <label for="period" class="block text-gray-700 text-sm font-bold mb-2">Period:</label>
-                <select id="period" name="period" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                    <option value="" disabled selected>Select Month</option>
-                    <option value="January">January</option>
-                    <option value="February">February</option>
-                    <option value="March">March</option>
-                    <option value="April">April</option>
-                    <option value="May">May</option>
-                    <option value="June">June</option>
-                    <option value="July">July</option>
-                    <option value="August">August</option>
-                    <option value="September">September</option>
-                    <option value="October">October</option>
-                    <option value="November">November</option>
-                    <option value="December">December</option>
-                </select>
+                <div class="custom-dropdown" id="periodFormDropdown">
+                    <button type="button" class="dropdown-btn">
+                        <span class="selected-text">Select Month</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search..." class="dropdown-search">
+                        </div>
+                        <div class="dropdown-options">
+                            <!-- Options will be populated here -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="period" name="period" required>
+                </div>
             </div>
             <div>
                 <label for="company" class="block text-gray-700 text-sm font-bold mb-2">Company:</label>
@@ -177,13 +182,22 @@
             </div>
             <div>
                 <label for="questionBy" class="block text-gray-700 text-sm font-bold mb-2">Question By (PIC):</label>
-                <select id="questionBy" name="questionBy" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                    <option value="" disabled selected>Select PIC</option>
-                    <option value="Esa">Esa</option>
-                    <option value="Bayu">Bayu</option>
-                    <option value="Kak Eko">Kak Eko</option>
-                    <option value="Eka">Eka</option>
-                </select>
+                <div class="custom-dropdown" id="picFormDropdown">
+                    <button type="button" class="dropdown-btn">
+                        <span class="selected-text">Select PIC</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search..." class="dropdown-search">
+                        </div>
+                        <div class="dropdown-options">
+                            <!-- Options will be populated here -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="questionBy" name="questionBy" required>
+                </div>
             </div>
             <div>
                 <label for="attachment" class="block text-gray-700 text-sm font-bold mb-2">Question Attachment (Link):</label>
@@ -197,21 +211,22 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Month</h2>
-                <select id="monthFilter" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                    <option value="">All Months</option>
-                    <option value="January">January</option>
-                    <option value="February">February</option>
-                    <option value="March">March</option>
-                    <option value="April">April</option>
-                    <option value="May">May</option>
-                    <option value="June">June</option>
-                    <option value="July">July</option>
-                    <option value="August">August</option>
-                    <option value="September">September</option>
-                    <option value="October">October</option>
-                    <option value="November">November</option>
-                    <option value="December">December</option>
-                </select>
+                <div class="custom-dropdown" id="monthFilterDropdown">
+                    <button type="button" class="dropdown-btn">
+                        <span class="selected-text">All Months</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search..." class="dropdown-search">
+                        </div>
+                        <div class="dropdown-options">
+                            <!-- Filter options will be populated here -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="monthFilter" name="monthFilter">
+                </div>
             </div>
             <div>
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Company</h2>
@@ -291,7 +306,12 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmbHdld2Z3bXV3eGd1bHB0cXJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU0OTIzNTEsImV4cCI6MjA2MTA2ODM1MX0.QIJ2Gr1GdHYmIxBl5aY3YpyCUz1HqSpBrT8UppdQU5o'; // Replace with your Supabase anon key
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Company list for the dropdown
+        // Data lists for dropdowns
+        const months = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        ];
+        
         const companyList = [
             "The Bluejay", "Barong Family", "Sababa - Elno Noli Putih", "Karisa Lifestyle",
             "Indah Nusa Timur", "INTEGRID", "Gelareh Design", "Sunkiss Restaurant",
@@ -321,17 +341,36 @@
             "PT SEA YOU BALI", "THE DOG PARADISE"
         ];
         
+        const picList = ["Esa", "Bayu", "Kak Eko", "Eka"];
+        
         // Initialize variables
         let issues = [];
         
         // Load data when the page is loaded
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize custom dropdowns
+            initDropdown('periodFormDropdown', months, true, (value) => {
+                document.getElementById('period').value = value;
+            });
+            
             initDropdown('companyFormDropdown', companyList, true, (value) => {
                 document.getElementById('company').value = value;
             });
             
-            // Initialize filter dropdown with "All Companies" option
+            initDropdown('picFormDropdown', picList, true, (value) => {
+                document.getElementById('questionBy').value = value;
+            });
+            
+            // Initialize filter dropdowns
+            initDropdown('monthFilterDropdown', ["All Months"].concat(months), false, (value) => {
+                if (value === "All Months") {
+                    document.getElementById('monthFilter').value = "";
+                } else {
+                    document.getElementById('monthFilter').value = value;
+                }
+                updateReportList();
+            });
+            
             initDropdown('companyFilterDropdown', ["All Companies"].concat(companyList), false, (value) => {
                 if (value === "All Companies") {
                     document.getElementById('companyFilter').value = "";
@@ -346,7 +385,6 @@
             // Add event listeners for buttons
             document.getElementById('exportButton').addEventListener('click', exportToCSV);
             document.getElementById('refreshButton').addEventListener('click', loadIssues);
-            document.getElementById('monthFilter').addEventListener('change', updateReportList);
         });
         
         // Initialize custom dropdown
@@ -485,9 +523,19 @@
         document.getElementById('issueForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Validate company selection
+            // Validate required fields
+            if (!document.getElementById('period').value) {
+                alert('Please select a period');
+                return;
+            }
+            
             if (!document.getElementById('company').value) {
                 alert('Please select a company');
+                return;
+            }
+            
+            if (!document.getElementById('questionBy').value) {
+                alert('Please select a PIC');
                 return;
             }
             
@@ -536,10 +584,14 @@
                 
                 if (error) throw error;
                 
-                // Reset form and dropdown
+                // Reset form and dropdowns
                 this.reset();
+                document.querySelector('#periodFormDropdown .selected-text').textContent = 'Select Month';
+                document.getElementById('period').value = '';
                 document.querySelector('#companyFormDropdown .selected-text').textContent = 'Select Company';
                 document.getElementById('company').value = '';
+                document.querySelector('#picFormDropdown .selected-text').textContent = 'Select PIC';
+                document.getElementById('questionBy').value = '';
                 
                 await loadIssues();
                 
