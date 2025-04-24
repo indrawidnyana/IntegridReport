@@ -264,22 +264,35 @@
     </div>
 
     <div class="filter-container bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Month</h2>
-        <select id="monthFilter" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            <option value="">All Months</option>
-            <option value="January">January</option>
-            <option value="February">February</option>
-            <option value="March">March</option>
-            <option value="April">April</option>
-            <option value="May">May</option>
-            <option value="June">June</option>
-            <option value="July">July</option>
-            <option value="August">August</option>
-            <option value="September">September</option>
-            <option value="October">October</option>
-            <option value="November">November</option>
-            <option value="December">December</option>
-        </select>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Month</h2>
+                <select id="monthFilter" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="">All Months</option>
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
+            </div>
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Company</h2>
+                <div class="select-wrapper relative">
+                    <input type="text" id="companyFilterSearch" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2" placeholder="Search Company..." autocomplete="off" oninput="filterCompanyOptions()">
+                    <select id="companyFilter" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">All Companies</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="report-list-container bg-white rounded-lg shadow-md p-6 mb-6">
@@ -373,7 +386,66 @@
             // Add event listeners for buttons
             document.getElementById('exportButton').addEventListener('click', exportToCSV);
             document.getElementById('refreshButton').addEventListener('click', loadIssues);
+            
+            // Add company filter event listener
+            document.getElementById('companyFilter').addEventListener('change', function() {
+                updateReportList();
+            });
+            
+            // Add event listener for company filter search
+            document.getElementById('companyFilterSearch').addEventListener('input', filterCompanyOptions);
         });
+
+        // Populate company filter dropdown based on loaded issues
+        function populateCompanyFilter() {
+            const companyFilter = document.getElementById('companyFilter');
+            
+            // Save selected value before clearing
+            const selectedValue = companyFilter.value;
+            
+            // Clear existing options except the first one (All Companies)
+            while (companyFilter.options.length > 1) {
+                companyFilter.remove(1);
+            }
+            
+            // Get unique company names from issues
+            const companies = issues.map(issue => issue.company);
+            const uniqueCompanies = [...new Set(companies)].filter(Boolean).sort();
+            
+            // Add options to dropdown
+            uniqueCompanies.forEach(company => {
+                const option = document.createElement('option');
+                option.value = company;
+                option.textContent = company;
+                companyFilter.appendChild(option);
+            });
+            
+            // Restore selected value if it exists in the new options
+            if (selectedValue) {
+                for (let i = 0; i < companyFilter.options.length; i++) {
+                    if (companyFilter.options[i].value === selectedValue) {
+                        companyFilter.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Filter company filter options based on search
+        function filterCompanyOptions() {
+            const input = document.getElementById('companyFilterSearch');
+            const filter = input.value.toLowerCase();
+            const options = document.getElementById('companyFilter').options;
+            
+            for (let i = 0; i < options.length; i++) {
+                const option = options[i];
+                if (i === 0 || option.text.toLowerCase().includes(filter)) {
+                    option.style.display = ""; // Show option
+                } else {
+                    option.style.display = "none"; // Hide option
+                }
+            }
+        }
 
         // Load issues from Supabase
         async function loadIssues() {
@@ -390,6 +462,9 @@
                 
                 issues = data || [];
                 updateReportList();
+                
+                // Populate company filter after loading issues
+                populateCompanyFilter();
             } catch (error) {
                 console.error('Error loading issues:', error);
                 document.getElementById('reportList').innerHTML = `
@@ -497,15 +572,11 @@
             }
         });
 
-        // Filter issues by month
-        document.getElementById('monthFilter').addEventListener('change', function() {
-            updateReportList();
-        });
-
         // Update the report list display
         function updateReportList() {
             let reportListDiv = document.getElementById('reportList');
             let selectedMonth = document.getElementById('monthFilter').value;
+            let selectedCompany = document.getElementById('companyFilter').value;
 
             if (issues.length === 0) {
                 reportListDiv.innerHTML = '<p>No issues reported yet.</p>';
@@ -513,8 +584,15 @@
             }
 
             let filteredIssues = issues; // Start with all issues
+            
+            // Apply month filter if selected
             if (selectedMonth) {
-                filteredIssues = issues.filter(issue => issue.period === selectedMonth);
+                filteredIssues = filteredIssues.filter(issue => issue.period === selectedMonth);
+            }
+            
+            // Apply company filter if selected
+            if (selectedCompany) {
+                filteredIssues = filteredIssues.filter(issue => issue.company === selectedCompany);
             }
 
             let reportListHTML = `<div class="table-responsive">
