@@ -348,7 +348,7 @@
     const testClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     console.log('Test client created:', testClient);
     
-    const { data, error } = await testClient.from('tax_issues').select('count()', { count: 'exact' });
+    const { data, error } = await testClient.from('tax_issues').select('id');
     console.log('Connection test result:', { data, error });
     
     if (error) {
