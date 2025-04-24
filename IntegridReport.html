@@ -25,51 +25,71 @@
         .table-responsive table {
             min-width: 800px;
         }
-        .select-wrapper select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
+        
+        /* Custom Dropdown Styles */
+        .custom-dropdown {
+            position: relative;
             width: 100%;
-            padding: 0.75rem 2.5rem 0.75rem 0.75rem;
-            border-radius: 0.375rem;
-            border: 1px solid #d1d5db;
-            outline: none;
-            font-size: 1rem;
-            color: #4b5563;
-            background-color: #fff;
+        }
+        
+        .dropdown-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px 15px;
+            background-color: #0D9F6F; /* Green color as in your image */
+            color: white;
+            border: none;
             cursor: pointer;
-            transition: border-color 0.15s ease-in-out, shadow-sm 0.15s ease-in-out;
+            text-align: left;
         }
-
-        .select-wrapper select:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-        }
-
-        .select-wrapper::after {
-            content: "";
+        
+        .dropdown-content {
+            display: none;
             position: absolute;
-            top: 50%;
-            right: 1rem;
-            transform: translateY(-50%);
-            width: 0.625rem;
-            height: 0.625rem;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-            background-size: 1rem;
-            background-repeat: no-repeat;
-            pointer-events: none;
+            background-color: white;
+            width: 100%;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 10;
+            border: 1px solid #f1f1f1;
         }
-
-        .select-wrapper select option {
-            padding: 0.75rem;
-            font-size: 1rem;
-            color: #4b5563;
-            background-color: #fff;
+        
+        .dropdown-content.show {
+            display: block;
         }
-
-        .select-wrapper select option:hover,
-        .select-wrapper select option:checked {
-            background-color: #f0f0f0;
+        
+        .search-container {
+            padding: 10px;
+            border-bottom: 1px solid #f1f1f1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-container input {
+            width: 100%;
+            border: none;
+            padding: 5px;
+            outline: none;
+        }
+        
+        .search-icon {
+            color: #aaa;
+            margin-right: 10px;
+        }
+        
+        .dropdown-options {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f9f9f9;
         }
         
         /* Loading spinner */
@@ -134,112 +154,22 @@
             </div>
             <div>
                 <label for="company" class="block text-gray-700 text-sm font-bold mb-2">Company:</label>
-                <div class="select-wrapper relative">
-                    <!-- Searchable Dropdown -->
-                    <input type="text" id="companySearch" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2" placeholder="Search Company..." autocomplete="off" oninput="filterCompanies()">
-                    
-                    <select id="company" name="company" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                        <option value="" disabled selected>Select Company</option>
-                        <option value="The Bluejay">The Bluejay</option>
-                        <option value="Barong Family">Barong Family</option>
-                        <option value="Sababa - Elno Noli Putih">Sababa - Elno Noli Putih</option>
-                        <option value="Karisa Lifestyle">Karisa Lifestyle</option>
-                        <option value="Indah Nusa Timur">Indah Nusa Timur</option>
-                        <option value="INTEGRID">INTEGRID</option>
-                        <option value="Gelareh Design">Gelareh Design</option>
-                        <option value="Sunkiss Restaurant">Sunkiss Restaurant</option>
-                        <option value="Rent Surfboard Bali">Rent Surfboard Bali</option>
-                        <option value="Improvea Maju Solusi">Improvea Maju Solusi</option>
-                        <option value="Trio Rukun Sejahtera">Trio Rukun Sejahtera</option>
-                        <option value="Ola Casa Bali">Ola Casa Bali</option>
-                        <option value="Moonkey Group">Moonkey Group</option>
-                        <option value="Anugrah Pangan Jaya (CIBO)">Anugrah Pangan Jaya (CIBO)</option>
-                        <option value="Liva">Liva</option>
-                        <option value="You Spa Bali">You Spa Bali</option>
-                        <option value="Pemandangan HIjau Bali">Pemandangan HIjau Bali</option>
-                        <option value="Kayu Living Bali">Kayu Living Bali</option>
-                        <option value="Serenity Property Bali">Serenity Property Bali</option>
-                        <option value="Weddingup Event Organizer">Weddingup Event Organizer</option>
-                        <option value="Bienaime Samyn Investment">Bienaime Samyn Investment</option>
-                        <option value="Bali Couple Retreats">Bali Couple Retreats</option>
-                        <option value="Denpasar Indah Seruni">Denpasar Indah Seruni</option>
-                        <option value="Maza Bali Investing">Maza Bali Investing</option>
-                        <option value="Martin Family Agency">Martin Family Agency</option>
-                        <option value="Masa Depan Utama Lestari">Masa Depan Utama Lestari</option>
-                        <option value="Sportva">Sportva</option>
-                        <option value="JGM Group Management">JGM Group Management</option>
-                        <option value="Naoli Eliam Group">Naoli Eliam Group</option>
-                        <option value="Evasion Villa Bali">Evasion Villa Bali</option>
-                        <option value="Pauline & Luke Consulting">Pauline & Luke Consulting</option>
-                        <option value="Bali Real Estate - Anjuna Bay">Bali Real Estate - Anjuna Bay</option>
-                        <option value="HMZ Digital Agency">HMZ Digital Agency</option>
-                        <option value="Shade Agency Bali">Shade Agency Bali</option>
-                        <option value="Mid Night Sun">Mid Night Sun</option>
-                        <option value="Neala Nature Stays">Neala Nature Stays</option>
-                        <option value="Deprince Global Services">Deprince Global Services</option>
-                        <option value="Lucky Cat Land">Lucky Cat Land</option>
-                        <option value="Only Loading Asia">Only Loading Asia</option>
-                        <option value="Women Bali Bahagia">Women Bali Bahagia</option>
-                        <option value="Sunder Jupiter Bali">Sunder Jupiter Bali</option>
-                        <option value="Aanoukis Tropix Retail">Aanoukis Tropix Retail</option>
-                        <option value="Bybali Build Consulting">Bybali Build Consulting</option>
-                        <option value="Snaaack Padang Bai">Snaaack Padang Bai</option>
-                        <option value="The Naluri Bali">The Naluri Bali</option>
-                        <option value="Hocus Pocus Prod">Hocus Pocus Prod</option>
-                        <option value="Kim Advantage Consulting">Kim Advantage Consulting</option>
-                        <option value="Bejoi Design Bali">Bejoi Design Bali</option>
-                        <option value="Nyata Consulting Bali">Nyata Consulting Bali</option>
-                        <option value="Tran Manh Sung">Tran Manh Sung</option>
-                        <option value="The Blackless Lovers">The Blackless Lovers</option>
-                        <option value="Maju Operation & Development">Maju Operation & Development</option>
-                        <option value="Dragon Indonesia Exotics">Dragon Indonesia Exotics</option>
-                        <option value="Elodie Mattei Group">Elodie Mattei Group</option>
-                        <option value="Chatelain Advisory Investment">Chatelain Advisory Investment</option>
-                        <option value="Cabana Bali Style">Cabana Bali Style</option>
-                        <option value="Good Move">Good Move</option>
-                        <option value="Slow Nomad Living">Slow Nomad Living</option>
-                        <option value="The Agency Bali">The Agency Bali</option>
-                        <option value="Esensi Digital Agency">Esensi Digital Agency</option>
-                        <option value="LNH Reality and Flavor">LNH Reality and Flavor</option>
-                        <option value="MYMS">MYMS</option>
-                        <option value="Modern Groove Reverie">Modern Groove Reverie</option>
-                        <option value="PT. LUNES SACREES BALI">PT. LUNES SACREES BALI</option>
-                        <option value="PT. JOY BIRD INVEST">PT. JOY BIRD INVEST</option>
-                        <option value="PT. WEAREBRAND PRODUCTION DIGITAL">PT. WEAREBRAND PRODUCTION DIGITAL</option>
-                        <option value="PT. BEBAS EXPERIENCE GROUP">PT. BEBAS EXPERIENCE GROUP</option>
-                        <option value="PT. THE SUNRISE PRODUCTION">PT. THE SUNRISE PRODUCTION</option>
-                        <option value="THE BACKLESS LOVERS">THE BACKLESS LOVERS</option>
-                        <option value="PT THE CENTURY GROUP">PT THE CENTURY GROUP</option>
-                        <option value="BALI ISLAND BOUNCE">BALI ISLAND BOUNCE </option>
-                        <option value="PT BALI JADAYO IMMO">PT BALI JADAYO IMMO</option>
-                        <option value="PT DEL VALLE GURRUTXAGA">PT DEL VALLE GURRUTXAGA</option>
-                        <option value="PT THE SURFER GUIDE BALI">PT THE SURFER GUIDE BALI</option>
-                        <option value="PT CALA BALI INVESTMENT">PT CALA BALI INVESTMENT</option>
-                        <option value="PT LEREGARD PRO BALI">PT LEREGARD PRO BALI</option>
-                        <option value="PT CHUNK THE FUTURE">PT CHUNK THE FUTURE</option>
-                        <option value="PT THE BALI PARADIS">PT THE BALI PARADIS</option>
-                        <option value="PT SEA YOU BALI">PT SEA YOU BALI</option>
-                        <option value="THE DOG PARADISE">THE DOG PARADISE</option>
-                    </select>
+                <div class="custom-dropdown" id="companyFormDropdown">
+                    <button type="button" class="dropdown-btn">
+                        <span class="selected-text">Select Company</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search..." class="dropdown-search">
+                        </div>
+                        <div class="dropdown-options">
+                            <!-- Options will be populated here -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="company" name="company" required>
                 </div>
-                
-                <script>
-                    // Add search functionality to filter the dropdown
-                    function filterCompanies() {
-                        let input = document.getElementById('companySearch');
-                        let filter = input.value.toLowerCase();
-                        let options = document.getElementById('company').options;
-                
-                        for (let i = 0; i < options.length; i++) {
-                            let option = options[i];
-                            if (option.text.toLowerCase().includes(filter)) {
-                                option.style.display = ""; // Show option if it matches
-                            } else {
-                                option.style.display = "none"; // Hide option if it doesn't match
-                            }
-                        }
-                    }
-                </script>
             </div>
             <div>
                 <label for="question" class="block text-gray-700 text-sm font-bold mb-2">Question:</label>
@@ -285,11 +215,21 @@
             </div>
             <div>
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Company</h2>
-                <div class="select-wrapper relative">
-                    <input type="text" id="companyFilterSearch" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2" placeholder="Search Company..." autocomplete="off" oninput="filterCompanyOptions()">
-                    <select id="companyFilter" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="">All Companies</option>
-                    </select>
+                <div class="custom-dropdown" id="companyFilterDropdown">
+                    <button type="button" class="dropdown-btn">
+                        <span class="selected-text">All Companies</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search..." class="dropdown-search">
+                        </div>
+                        <div class="dropdown-options">
+                            <!-- Filter options will be populated here -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="companyFilter" name="companyFilter">
                 </div>
             </div>
         </div>
@@ -351,100 +291,155 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmbHdld2Z3bXV3eGd1bHB0cXJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU0OTIzNTEsImV4cCI6MjA2MTA2ODM1MX0.QIJ2Gr1GdHYmIxBl5aY3YpyCUz1HqSpBrT8UppdQU5o'; // Replace with your Supabase anon key
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        console.log('Supabase client:', supabaseClient);
-        console.log('Supabase client methods:', Object.keys(supabaseClient));
-
-        document.addEventListener('DOMContentLoaded', async function() {
-  try {
-    console.log('Testing Supabase connection...');
-    console.log('Supabase object type:', typeof supabase);
-    console.log('createClient type:', typeof supabase.createClient);
-    
-    const testClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log('Test client created:', testClient);
-    
-    const { data, error } = await testClient.from('tax_issues').select('id');
-    console.log('Connection test result:', { data, error });
-    
-    if (error) {
-      console.error('Supabase connection test failed:', error);
-    } else {
-      console.log('Supabase connection successful!');
-    }
-  } catch (e) {
-    console.error('Error in Supabase test:', e);
-  }
-});
+        // Company list for the dropdown
+        const companyList = [
+            "The Bluejay", "Barong Family", "Sababa - Elno Noli Putih", "Karisa Lifestyle",
+            "Indah Nusa Timur", "INTEGRID", "Gelareh Design", "Sunkiss Restaurant",
+            "Rent Surfboard Bali", "Improvea Maju Solusi", "Trio Rukun Sejahtera",
+            "Ola Casa Bali", "Moonkey Group", "Anugrah Pangan Jaya (CIBO)", "Liva",
+            "You Spa Bali", "Pemandangan HIjau Bali", "Kayu Living Bali",
+            "Serenity Property Bali", "Weddingup Event Organizer", "Bienaime Samyn Investment",
+            "Bali Couple Retreats", "Denpasar Indah Seruni", "Maza Bali Investing",
+            "Martin Family Agency", "Masa Depan Utama Lestari", "Sportva",
+            "JGM Group Management", "Naoli Eliam Group", "Evasion Villa Bali",
+            "Pauline & Luke Consulting", "Bali Real Estate - Anjuna Bay", "HMZ Digital Agency",
+            "Shade Agency Bali", "Mid Night Sun", "Neala Nature Stays",
+            "Deprince Global Services", "Lucky Cat Land", "Only Loading Asia",
+            "Women Bali Bahagia", "Sunder Jupiter Bali", "Aanoukis Tropix Retail",
+            "Bybali Build Consulting", "Snaaack Padang Bai", "The Naluri Bali",
+            "Hocus Pocus Prod", "Kim Advantage Consulting", "Bejoi Design Bali",
+            "Nyata Consulting Bali", "Tran Manh Sung", "The Blackless Lovers",
+            "Maju Operation & Development", "Dragon Indonesia Exotics", "Elodie Mattei Group",
+            "Chatelain Advisory Investment", "Cabana Bali Style", "Good Move",
+            "Slow Nomad Living", "The Agency Bali", "Esensi Digital Agency",
+            "LNH Reality and Flavor", "MYMS", "Modern Groove Reverie",
+            "PT. LUNES SACREES BALI", "PT. JOY BIRD INVEST", "PT. WEAREBRAND PRODUCTION DIGITAL",
+            "PT. BEBAS EXPERIENCE GROUP", "PT. THE SUNRISE PRODUCTION", "THE BACKLESS LOVERS",
+            "PT THE CENTURY GROUP", "BALI ISLAND BOUNCE", "PT BALI JADAYO IMMO",
+            "PT DEL VALLE GURRUTXAGA", "PT THE SURFER GUIDE BALI", "PT CALA BALI INVESTMENT",
+            "PT LEREGARD PRO BALI", "PT CHUNK THE FUTURE", "PT THE BALI PARADIS",
+            "PT SEA YOU BALI", "THE DOG PARADISE"
+        ];
         
         // Initialize variables
         let issues = [];
         
         // Load data when the page is loaded
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize custom dropdowns
+            initDropdown('companyFormDropdown', companyList, true, (value) => {
+                document.getElementById('company').value = value;
+            });
+            
+            // Initialize filter dropdown with "All Companies" option
+            initDropdown('companyFilterDropdown', ["All Companies"].concat(companyList), false, (value) => {
+                if (value === "All Companies") {
+                    document.getElementById('companyFilter').value = "";
+                } else {
+                    document.getElementById('companyFilter').value = value;
+                }
+                updateReportList();
+            });
+            
             loadIssues();
             
             // Add event listeners for buttons
             document.getElementById('exportButton').addEventListener('click', exportToCSV);
             document.getElementById('refreshButton').addEventListener('click', loadIssues);
+            document.getElementById('monthFilter').addEventListener('change', updateReportList);
+        });
+        
+        // Initialize custom dropdown
+        function initDropdown(dropdownId, options, isRequired, onSelect) {
+            const dropdown = document.getElementById(dropdownId);
+            const btn = dropdown.querySelector('.dropdown-btn');
+            const content = dropdown.querySelector('.dropdown-content');
+            const searchInput = content.querySelector('.dropdown-search');
+            const optionsContainer = content.querySelector('.dropdown-options');
+            const selectedText = btn.querySelector('.selected-text');
             
-            // Add company filter event listener
-            document.getElementById('companyFilter').addEventListener('change', function() {
-                updateReportList();
+            // Populate dropdown options
+            populateDropdownOptions(optionsContainer, options, (value) => {
+                selectedText.textContent = value;
+                onSelect(value);
+                content.classList.remove('show');
             });
             
-            // Add event listener for company filter search
-            document.getElementById('companyFilterSearch').addEventListener('input', filterCompanyOptions);
-        });
-
-        // Populate company filter dropdown based on loaded issues
-        function populateCompanyFilter() {
-            const companyFilter = document.getElementById('companyFilter');
+            // Toggle dropdown
+            btn.addEventListener('click', function() {
+                content.classList.toggle('show');
+                if (content.classList.contains('show')) {
+                    searchInput.focus();
+                    // Reset search each time
+                    searchInput.value = '';
+                    filterDropdownOptions(optionsContainer, '');
+                }
+            });
             
-            // Save selected value before clearing
-            const selectedValue = companyFilter.value;
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                filterDropdownOptions(optionsContainer, this.value);
+            });
             
-            // Clear existing options except the first one (All Companies)
-            while (companyFilter.options.length > 1) {
-                companyFilter.remove(1);
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target)) {
+                    content.classList.remove('show');
+                }
+            });
+            
+            // Validate required field if needed
+            if (isRequired) {
+                // This is for form validation
+                // You might need to add more logic based on your form submission needs
             }
+        }
+        
+        // Populate dropdown options
+        function populateDropdownOptions(container, options, onSelect) {
+            container.innerHTML = '';
+            options.forEach(option => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.textContent = option;
+                item.addEventListener('click', () => onSelect(option));
+                container.appendChild(item);
+            });
+        }
+        
+        // Filter dropdown options
+        function filterDropdownOptions(container, searchText) {
+            const items = container.querySelectorAll('.dropdown-item');
+            const searchLower = searchText.toLowerCase();
             
-            // Get unique company names from issues
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchLower)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        // Update company filter dropdown based on current issues
+        function updateCompanyFilterDropdown() {
+            // Get unique companies from issues
             const companies = issues.map(issue => issue.company);
             const uniqueCompanies = [...new Set(companies)].filter(Boolean).sort();
             
-            // Add options to dropdown
-            uniqueCompanies.forEach(company => {
-                const option = document.createElement('option');
-                option.value = company;
-                option.textContent = company;
-                companyFilter.appendChild(option);
-            });
-            
-            // Restore selected value if it exists in the new options
-            if (selectedValue) {
-                for (let i = 0; i < companyFilter.options.length; i++) {
-                    if (companyFilter.options[i].value === selectedValue) {
-                        companyFilter.selectedIndex = i;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // Filter company filter options based on search
-        function filterCompanyOptions() {
-            const input = document.getElementById('companyFilterSearch');
-            const filter = input.value.toLowerCase();
-            const options = document.getElementById('companyFilter').options;
-            
-            for (let i = 0; i < options.length; i++) {
-                const option = options[i];
-                if (i === 0 || option.text.toLowerCase().includes(filter)) {
-                    option.style.display = ""; // Show option
+            // Update the dropdown options
+            const optionsContainer = document.querySelector('#companyFilterDropdown .dropdown-options');
+            populateDropdownOptions(optionsContainer, ["All Companies"].concat(uniqueCompanies), (value) => {
+                if (value === "All Companies") {
+                    document.getElementById('companyFilter').value = "";
                 } else {
-                    option.style.display = "none"; // Hide option
+                    document.getElementById('companyFilter').value = value;
                 }
-            }
+                document.querySelector('#companyFilterDropdown .selected-text').textContent = value;
+                document.querySelector('#companyFilterDropdown .dropdown-content').classList.remove('show');
+                updateReportList();
+            });
         }
 
         // Load issues from Supabase
@@ -463,8 +458,8 @@
                 issues = data || [];
                 updateReportList();
                 
-                // Populate company filter after loading issues
-                populateCompanyFilter();
+                // Update company filter dropdown with current companies
+                updateCompanyFilterDropdown();
             } catch (error) {
                 console.error('Error loading issues:', error);
                 document.getElementById('reportList').innerHTML = `
@@ -490,10 +485,12 @@
         document.getElementById('issueForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            console.log('Form submission started');
-            console.log('Using supabaseClient:', supabaseClient);
-            console.log('supabaseClient methods:', Object.keys(supabaseClient));
-
+            // Validate company selection
+            if (!document.getElementById('company').value) {
+                alert('Please select a company');
+                return;
+            }
+            
             // Disable submit button and show loading state
             const submitButton = this.querySelector('button[type="submit"]');
             const originalButtonText = submitButton.innerHTML;
@@ -539,8 +536,11 @@
                 
                 if (error) throw error;
                 
-                // Reset form and reload issues
+                // Reset form and dropdown
                 this.reset();
+                document.querySelector('#companyFormDropdown .selected-text').textContent = 'Select Company';
+                document.getElementById('company').value = '';
+                
                 await loadIssues();
                 
                 // Display success response
