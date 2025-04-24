@@ -450,6 +450,9 @@
                 `;
             } catch (error) {
                 console.error('Error submitting issue:', error);
+                if (error.details) console.error('Error details:', error.details);
+                if (error.hint) console.error('Error hint:', error.hint);
+                if (error.code) console.error('Error code:', error.code);
                 responseDiv.innerHTML = `
                     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                         <strong class="font-bold">Error!</strong>
