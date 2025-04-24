@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.38.4/dist/umd/supabase.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -334,8 +334,32 @@
         // Initialize Supabase client
         const SUPABASE_URL = 'https://rflwewfwmuwxgulptqrv.supabase.co'; // Replace with your Supabase URL
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmbHdld2Z3bXV3eGd1bHB0cXJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU0OTIzNTEsImV4cCI6MjA2MTA2ODM1MX0.QIJ2Gr1GdHYmIxBl5aY3YpyCUz1HqSpBrT8UppdQU5o'; // Replace with your Supabase anon key
-        const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        console.log('Supabase client:', supabaseClient);
+        console.log('Supabase client methods:', Object.keys(supabaseClient));
+
+        document.addEventListener('DOMContentLoaded', async function() {
+  try {
+    console.log('Testing Supabase connection...');
+    console.log('Supabase object type:', typeof supabase);
+    console.log('createClient type:', typeof supabase.createClient);
+    
+    const testClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('Test client created:', testClient);
+    
+    const { data, error } = await testClient.from('tax_issues').select('count()', { count: 'exact' });
+    console.log('Connection test result:', { data, error });
+    
+    if (error) {
+      console.error('Supabase connection test failed:', error);
+    } else {
+      console.log('Supabase connection successful!');
+    }
+  } catch (e) {
+    console.error('Error in Supabase test:', e);
+  }
+});
         
         // Initialize variables
         let issues = [];
