@@ -501,6 +501,64 @@
             // Add event listeners for buttons
             document.getElementById('exportButton').addEventListener('click', exportToCSV);
             document.getElementById('refreshButton').addEventListener('click', loadIssues);
+            
+            // Add event listeners for pagination
+            document.querySelector('[data-page="first"]').addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage = 1;
+                    updateReportList();
+                }
+            });
+            
+            document.querySelector('[data-page="prev"]').addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updateReportList();
+                }
+            });
+            
+            document.querySelector('[data-page="next"]').addEventListener('click', function() {
+                const totalPages = Math.max(1, Math.ceil(issues.length / issuesPerPage));
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updateReportList();
+                }
+            });
+            
+            document.querySelector('[data-page="last"]').addEventListener('click', function() {
+                const totalPages = Math.max(1, Math.ceil(issues.length / issuesPerPage));
+                if (currentPage < totalPages) {
+                    currentPage = totalPages;
+                    updateReportList();
+                }
+            });
+            
+            // Add event listeners for page numbers
+            document.querySelectorAll('.page-number').forEach(button => {
+                button.addEventListener('click', function() {
+                    const pageNum = parseInt(this.dataset.page);
+                    if (pageNum !== currentPage) {
+                        currentPage = pageNum;
+                        updateReportList();
+                    }
+                });
+            });
+            
+            // Add event listener for page input
+            document.getElementById('pageInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const totalPages = Math.max(1, Math.ceil(issues.length / issuesPerPage));
+                    const goToPage = parseInt(this.value);
+                    if (!isNaN(goToPage) && goToPage >= 1 && goToPage <= totalPages) {
+                        currentPage = goToPage;
+                        updateReportList();
+                    } else {
+                        alert(`Please enter a valid page number between 1 and ${totalPages}`);
+                        this.value = currentPage;
+                    }
+                }
+            });
         });
         
         // Initialize custom dropdown
