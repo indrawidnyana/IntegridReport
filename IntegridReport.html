@@ -179,6 +179,24 @@
         .preserve-linebreaks {
             white-space: pre-line;
         }
+        
+        /* Pagination styles */
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        
+        .page-number {
+            min-width: 2.5rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-6 rounded-lg">
@@ -414,6 +432,8 @@
         
         // Initialize variables
         let issues = [];
+        let currentPage = 1;
+        const issuesPerPage = 5;
         
         // Load data when the page is loaded
         document.addEventListener('DOMContentLoaded', function() {
@@ -437,6 +457,7 @@
                 } else {
                     document.getElementById('monthFilter').value = value;
                 }
+                currentPage = 1; // Reset to first page when filter changes
                 updateReportList();
             });
             
@@ -446,6 +467,7 @@
                 } else {
                     document.getElementById('companyFilter').value = value;
                 }
+                currentPage = 1; // Reset to first page when filter changes
                 updateReportList();
             });
             
