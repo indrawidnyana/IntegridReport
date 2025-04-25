@@ -181,6 +181,27 @@
             white-space: pre-line;
         }
         
+        /* More column width controls */
+        .question-column {
+            max-width: 250px; /* Limit question column width */
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .company-column {
+            max-width: 150px;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        
+        .answer-column {
+            max-width: 250px;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
         /* Pagination styles */
         .pagination-container {
             display: flex;
@@ -795,12 +816,12 @@
                         <tr>
                             <th class="px-4 py-2 border border-gray-300 text-left">Issue #</th>
                             <th class="px-4 py-2 border border-gray-300 text-left">Period</th>
-                            <th class="px-4 py-2 border border-gray-300 text-left">Company</th>
-                            <th class="px-4 py-2 border border-gray-300 text-left">Question</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left company-column">Company</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left question-column">Question</th>
                             <th class="px-4 py-2 border border-gray-300 text-left">Question By (PIC)</th>
                             <th class="px-4 py-2 border border-gray-300 text-center">Attachment</th>
                             <th class="px-4 py-2 border border-gray-300 text-center">Status</th>
-                            <th class="px-4 py-2 border border-gray-300 text-left">Answer</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left answer-column">Answer</th>
                             <th class="px-4 py-2 border border-gray-300 text-center">Answer Attachment</th>
                             <th class="action-column border border-gray-300 text-center">Action</th>
                         </tr>
@@ -811,12 +832,12 @@
                                 <tr>
                                     <td class="px-4 py-2 border border-gray-300">${issue.issue_number}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.period}</td>
-                                    <td class="px-4 py-2 border border-gray-300">${issue.company}</td>
-                                    <td class="px-4 py-2 border border-gray-300 preserve-linebreaks">${issue.question}</td>
+                                    <td class="px-4 py-2 border border-gray-300 company-column">${issue.company}</td>
+                                    <td class="px-4 py-2 border border-gray-300 preserve-linebreaks question-column">${issue.question}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.question_by}</td>
                                     <td class="px-4 py-2 border border-gray-300 text-center">${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block text-sm">Here</a>` : 'No attachment'}</td>
                                     <td class="px-4 py-2 border border-gray-300 text-center"><span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></td>
-                                    <td class="px-4 py-2 border border-gray-300 preserve-linebreaks">${issue.answer ? issue.answer : 'Awaiting Answer'}</td>
+                                    <td class="px-4 py-2 border border-gray-300 preserve-linebreaks answer-column">${issue.answer ? issue.answer : 'Awaiting Answer'}</td>
                                     <td class="px-4 py-2 border border-gray-300 text-center">${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block text-sm">Here</a>` : 'No attachment'}</td>
                                     <td class="action-column border border-gray-300 text-center">
                                         <div class="flex flex-col items-center justify-center w-full">
