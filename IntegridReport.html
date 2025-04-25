@@ -189,7 +189,7 @@
         /* More column width controls */
         .question-column, .answer-column {
             max-width: 350px; /* Same width for both question and answer */
-            white-space: normal;
+            white-space: pre-wrap !important;
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
@@ -582,8 +582,11 @@
                 answerQuill = new Quill('#answer-editor-container', {
                     modules: {
                         toolbar: [
-                            ['bold', 'italic', 'underline'],    // Include only basic formatting
-                        ]
+                            ['bold', 'italic', 'underline'],
+                        ],
+                        clipboard: {
+                            matchVisual: false  // Helps maintain line breaks
+                        }
                     },
                     placeholder: 'Enter your answer here...',
                     theme: 'snow'
@@ -890,11 +893,11 @@
                                     <td class="px-4 py-2 border border-gray-300">${issue.issue_number}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.period}</td>
                                     <td class="px-4 py-2 border border-gray-300 company-column">${issue.company}</td>
-                                    <td class="px-4 py-2 border border-gray-300 question-column">${issue.question}</td>
+                                    <td class="px-4 py-2 border border-gray-300 question-column" style="white-space: pre-wrap;">${issue.question}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.question_by}</td>
                                     <td class="px-4 py-2 border border-gray-300 text-center">${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block text-sm">Here</a>` : 'No attachment'}</td>
                                     <td class="px-4 py-2 border border-gray-300 text-center"><span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></td>
-                                    <td class="px-4 py-2 border border-gray-300 answer-column">${issue.answer ? issue.answer : 'Awaiting Answer'}</td>
+                                    <td class="px-4 py-2 border border-gray-300 answer-column" style="white-space: pre-wrap;">${issue.answer ? issue.answer : 'Awaiting Answer'}</td>
                                     <td class="px-4 py-2 border border-gray-300 text-center">${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block text-sm">Here</a>` : 'No attachment'}</td>
                                     <td class="action-column border border-gray-300 text-center">
                                         <div class="flex flex-col items-center justify-center w-full">
@@ -1247,12 +1250,12 @@
                         <p><span class="font-semibold">Issue Number:</span> ${issue.issue_number}</p>
                         <p><span class="font-semibold">Period:</span> ${issue.period}</p>
                         <p><span class="font-semibold">Company:</span> ${issue.company}</p>
-                        <p><span class="font-semibold">Question:</span> <span class="preserve-linebreaks">${issue.question}</span></p>
+                        <p><span class="font-semibold">Question:</span> <div class="preserve-linebreaks" style="white-space: pre-wrap;">${issue.question}</div></p>
                         <p><span class="font-semibold">Question By (PIC):</span> ${issue.question_by}</p>
                         <p><span class="font-semibold">Question Attachment:</span> ${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</p>
                     </div>
                     <div class="mb-4 border-t border-gray-200 pt-4">
-                        <p><span class="font-semibold">Answer:</span> <span class="preserve-linebreaks">${issue.answer ? issue.answer : 'Awaiting Answer'}</span></p>
+                        <p><span class="font-semibold">Answer:</span> <div class="preserve-linebreaks" style="white-space: pre-wrap;">${issue.answer ? issue.answer : 'Awaiting Answer'}</div></p>
                         <p class="flex items-center"><span class="font-semibold">Answer Attachment:</span> <span class="ml-2">${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block text-sm">Here</a>` : 'No attachment'}</span></p>
                     </div>
                     <div class="mb-4 border-t border-gray-200 pt-4">
