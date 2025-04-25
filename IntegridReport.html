@@ -167,6 +167,11 @@
         .answer-btn:hover {
             background-color: #2980b9;
         }
+        
+        /* Add these styles for preserving line breaks */
+        .preserve-linebreaks {
+            white-space: pre-line;
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-6 rounded-lg">
@@ -334,7 +339,7 @@
         </div>
     </div>
 
-     <div class="answer-form-container bg-white rounded-lg shadow-md p-8 mt-6" style="display: none;">
+    <div class="answer-form-container bg-white rounded-lg shadow-md p-8 mt-6" style="display: none;">
         <h2 class="text-xl font-semibold text-gray-800 mb-6">Answer Issue</h2>
         <form id="answerForm" class="space-y-4">
             <input type="hidden" id="issueId" name="issueId">
@@ -727,19 +732,19 @@
                                     <td class="px-4 py-2 border border-gray-300">${issue.issue_number}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.period}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.company}</td>
-                                    <td class="px-4 py-2 border border-gray-300">${issue.question}</td>
+                                    <td class="px-4 py-2 border border-gray-300 preserve-linebreaks">${issue.question}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.question_by}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</td>
                                     <td class="px-4 py-2 border border-gray-300"><span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></td>
-                                    <td class="px-4 py-2 border border-gray-300">${issue.answer ? issue.answer : 'Awaiting Answer'}</td>
+                                    <td class="px-4 py-2 border border-gray-300 preserve-linebreaks">${issue.answer ? issue.answer : 'Awaiting Answer'}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</td>
                                     <td class="action-column border border-gray-300">
                                         ${issue.answer ? 
-                                          `<button class="action-button edit-btn edit-answer-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Edit Answer</button>
-                                           <button class="action-button delete-btn delete-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Delete</button>` 
+                                        `<button class="action-button edit-btn edit-answer-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Edit Answer</button>
+                                        <button class="action-button delete-btn delete-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Delete</button>` 
                                         : 
-                                          `<button class="action-button answer-btn answer-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Answer Issue</button>
-                                           <button class="action-button delete-btn delete-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Delete</button>`}
+                                        `<button class="action-button answer-btn answer-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Answer Issue</button>
+                                        <button class="action-button delete-btn delete-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Delete</button>`}
                                     </td>
                                 </tr>
                             `;
@@ -910,12 +915,12 @@
                         <p><span class="font-semibold">Issue Number:</span> ${issue.issue_number}</p>
                         <p><span class="font-semibold">Period:</span> ${issue.period}</p>
                         <p><span class="font-semibold">Company:</span> ${issue.company}</p>
-                        <p><span class="font-semibold">Question:</span> ${issue.question}</p>
+                        <p><span class="font-semibold">Question:</span> <span class="preserve-linebreaks">${issue.question}</span></p>
                         <p><span class="font-semibold">Question By (PIC):</span> ${issue.question_by}</p>
                         <p><span class="font-semibold">Question Attachment:</span> ${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</p>
                     </div>
                     <div class="mb-4 border-t border-gray-200 pt-4">
-                        <p><span class="font-semibold">Answer:</span> ${issue.answer ? issue.answer : 'Awaiting Answer'}</p>
+                        <p><span class="font-semibold">Answer:</span> <span class="preserve-linebreaks">${issue.answer ? issue.answer : 'Awaiting Answer'}</span></p>
                         <p><span class="font-semibold">Answer Attachment:</span> ${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</p>
                     </div>
                     <div class="mb-4 border-t border-gray-200 pt-4">
