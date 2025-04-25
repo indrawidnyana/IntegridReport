@@ -116,7 +116,7 @@
             min-width: 150px;
             width: 150px;
             padding: 4px;
-            vertical-align: top;
+            vertical-align: middle;
         }
 
         .action-header {
@@ -127,11 +127,17 @@
             border: 1px solid #d1d5db;
             border-radius: 4px 4px 0 0;
         }
+        
+        /* Add styling for the action column title */
+        th.action-column {
+            background-color: #f3f4f6;
+            font-weight: bold;
+        }
 
         .action-button {
             width: 100%;
             min-height: 44px;
-            margin: 4px 0;
+            margin: 4px auto;
             padding: 10px 15px;
             text-align: center;
             border: none;
@@ -142,6 +148,7 @@
             display: block;
             font-size: 14px;
             transition: background-color 0.2s;
+            max-width: 150px;
         }
 
         .edit-btn {
@@ -734,18 +741,18 @@
                                     <td class="px-4 py-2 border border-gray-300">${issue.company}</td>
                                     <td class="px-4 py-2 border border-gray-300 preserve-linebreaks">${issue.question}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.question_by}</td>
-                                    <td class="px-4 py-2 border border-gray-300">${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</td>
-                                    <td class="px-4 py-2 border border-gray-300"><span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></td>
+                                    <td class="px-4 py-2 border border-gray-300 text-center">${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block text-sm">Here</a>` : 'No attachment'}</td>
+                                    <td class="px-4 py-2 border border-gray-300 text-center"><span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></td>
                                     <td class="px-4 py-2 border border-gray-300 preserve-linebreaks">${issue.answer ? issue.answer : 'Awaiting Answer'}</td>
-                                    <td class="px-4 py-2 border border-gray-300">${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</td>
+                                    <td class="px-4 py-2 border border-gray-300 text-center">${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block text-sm">Here</a>` : 'No attachment'}</td>
                                     <td class="action-column border border-gray-300 text-center">
-                                        <div class="flex flex-col items-center justify-center">
+                                        <div class="flex flex-col items-center justify-center w-full">
                                             ${issue.answer ? 
-                                            `<button class="action-button edit-btn edit-answer-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Edit Answer</button>
-                                            <button class="action-button delete-btn delete-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Delete</button>` 
+                                            `<button class="action-button edit-btn edit-answer-button w-full mx-auto" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Edit Answer</button>
+                                            <button class="action-button delete-btn delete-button w-full mx-auto" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Delete</button>` 
                                             : 
-                                            `<button class="action-button answer-btn answer-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Answer Issue</button>
-                                            <button class="action-button delete-btn delete-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Delete</button>`}
+                                            `<button class="action-button answer-btn answer-button w-full mx-auto" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Answer Issue</button>
+                                            <button class="action-button delete-btn delete-button w-full mx-auto" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Delete</button>`}
                                         </div>
                                     </td>
                                 </tr>
