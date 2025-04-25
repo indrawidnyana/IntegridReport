@@ -178,12 +178,14 @@
         
         /* Add these styles for preserving line breaks */
         .preserve-linebreaks {
-            white-space: pre-line;
+            white-space: pre-line !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         
         /* More column width controls */
         .question-column {
-            max-width: 700px; /* Increased from 250px to 350px */
+            max-width: 550px; /* Increased from 250px to 350px */
             white-space: normal;
             word-wrap: break-word;
             overflow-wrap: break-word;
@@ -196,7 +198,7 @@
         }
         
         .answer-column {
-            max-width: 450px; /* Increased from 250px to 350px */
+            max-width: 400px; /* Increased from 250px to 350px */
             white-space: normal;
             word-wrap: break-word;
             overflow-wrap: break-word;
