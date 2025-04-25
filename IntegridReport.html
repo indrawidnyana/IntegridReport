@@ -187,16 +187,40 @@
             cursor: not-allowed;
         }
         
+        // Update the pagination controls style to match image 2
         .pagination-controls {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             margin-top: 1rem;
+            padding: 1rem;
         }
         
         .page-number {
             min-width: 2.5rem;
+            height: 2.5rem;
             text-align: center;
+            margin: 0 2px;
+        }
+        
+        .page-number.active {
+            background-color: #0891b2;
+            color: white;
+        }
+        
+        .go-to-page {
+            display: flex;
+            align-items: center;
+            margin-left: 1rem;
+        }
+        
+        .go-to-page input {
+            width: 60px;
+            height: 2.5rem;
+            text-align: center;
+            margin: 0 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
         }
     </style>
 </head>
@@ -434,7 +458,7 @@
         // Initialize variables
         let issues = [];
         let currentPage = 1;
-        const issuesPerPage = 5;
+        const issuesPerPage = 5; // Strictly 5 items per page
         
         // Load data when the page is loaded
         document.addEventListener('DOMContentLoaded', function() {
@@ -523,6 +547,7 @@
                 // This is for form validation
                 // You might need to add more logic based on your form submission needs
             }
+            // End of the function - closing brace for pageInput event listener
         }
         
         // Populate dropdown options
