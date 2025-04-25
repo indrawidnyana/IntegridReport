@@ -717,7 +717,7 @@
                             <th class="px-4 py-2 border border-gray-300 text-left">Status</th>
                             <th class="px-4 py-2 border border-gray-300 text-left">Answer</th>
                             <th class="px-4 py-2 border border-gray-300 text-left">Answer Attachment</th>
-                            <th class="action-column border border-gray-300 text-center">Action</th>
+                            <th class="action-column border border-gray-300 text-center"></th>
                         </tr>
                     </thead>
                     <tbody class="bg-white">
@@ -734,7 +734,6 @@
                                     <td class="px-4 py-2 border border-gray-300">${issue.answer ? issue.answer : 'Awaiting Answer'}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</td>
                                     <td class="action-column border border-gray-300">
-                                        <div class="action-header">Action</div>
                                         ${issue.answer ? 
                                           `<button class="action-button edit-btn edit-answer-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Edit Answer</button>
                                            <button class="action-button delete-btn delete-button" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Delete</button>` 
