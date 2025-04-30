@@ -1336,10 +1336,10 @@
     </script>
     
     <!-- Console Log Viewer -->
-<div id="consoleViewer" class="fixed bottom-4 right-4 z-50">
+    <div id="consoleViewer" class="fixed bottom-4 right-4 z-50">
     <!-- Toggle Button -->
     <button id="toggleConsole" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full shadow-lg">
-        Show Console
+        _
     </button>
     
     <!-- Console Output -->
@@ -1434,7 +1434,7 @@
         const consoleOutput = document.getElementById('consoleOutput');
         const isHidden = consoleOutput.classList.contains('hidden');
         consoleOutput.classList.toggle('hidden');
-        this.textContent = isHidden ? 'Hide Console' : 'Show Console';
+        this.textContent = isHidden ? '_' : '_';
     });
 
     // Clear console
