@@ -1334,5 +1334,135 @@
             document.body.removeChild(link);
         }
     </script>
+    
+    <!-- Console Log Viewer -->
+<div id="consoleViewer" class="fixed bottom-4 right-4 z-50">
+    <!-- Toggle Button -->
+    <button id="toggleConsole" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full shadow-lg">
+        Show Console
+    </button>
+    
+    <!-- Console Output -->
+    <div id="consoleOutput" class="hidden bg-gray-900 text-green-400 p-4 rounded-lg shadow-xl mt-2 w-96 h-64 overflow-auto font-mono text-sm">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-white font-bold">Console Log</span>
+            <button id="clearConsole" class="text-red-500 hover:text-red-400 text-xs">Clear</button>
+        </div>
+        <div id="logContent"></div>
+    </div>
+</div>
+
+<!-- Add this script just before closing body tag -->
+<script>
+    // Console logging override
+    const originalConsole = {
+        log: console.log,
+        error: console.error,
+        warn: console.warn,
+        info: console.info
+    };
+
+    // Function to get client IP address
+    async function getClientIP() {
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            return data.ip;
+        } catch (error) {
+            return 'Unable to get IP';
+        }
+    }
+
+    // Function to get device info
+    function getDeviceInfo() {
+        return {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            vendor: navigator.vendor,
+            language: navigator.language
+        };
+    }
+
+    // Function to add log entry
+    async function addLogEntry(type, args) {
+        const logContent = document.getElementById('logContent');
+        const timestamp = new Date().toLocaleTimeString();
+        const ip = await getClientIP();
+        const deviceInfo = getDeviceInfo();
+        
+        const logEntry = document.createElement('div');
+        logEntry.className = `mb-2 ${type === 'error' ? 'text-red-500' : type === 'warn' ? 'text-yellow-500' : ''}`;
+        
+        const logMessage = Array.from(args).map(arg => 
+            typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+        ).join(' ');
+
+        logEntry.innerHTML = `
+            <div class="text-xs text-gray-500">${timestamp}</div>
+            <div class="text-xs text-blue-400">IP: ${ip}</div>
+            <div class="text-xs text-purple-400">Device: ${deviceInfo.platform}</div>
+            <div>${logMessage}</div>
+        `;
+        
+        logContent.appendChild(logEntry);
+        logContent.scrollTop = logContent.scrollHeight;
+    }
+
+    // Override console methods
+    console.log = function() {
+        originalConsole.log.apply(console, arguments);
+        addLogEntry('log', arguments);
+    };
+    
+    console.error = function() {
+        originalConsole.error.apply(console, arguments);
+        addLogEntry('error', arguments);
+    };
+    
+    console.warn = function() {
+        originalConsole.warn.apply(console, arguments);
+        addLogEntry('warn', arguments);
+    };
+    
+    console.info = function() {
+        originalConsole.info.apply(console, arguments);
+        addLogEntry('info', arguments);
+    };
+
+    // Toggle console viewer
+    document.getElementById('toggleConsole').addEventListener('click', function() {
+        const consoleOutput = document.getElementById('consoleOutput');
+        const isHidden = consoleOutput.classList.contains('hidden');
+        consoleOutput.classList.toggle('hidden');
+        this.textContent = isHidden ? 'Hide Console' : 'Show Console';
+    });
+
+    // Clear console
+    document.getElementById('clearConsole').addEventListener('click', function() {
+        document.getElementById('logContent').innerHTML = '';
+    });
+
+    // Add logging for form submissions and actions
+    document.getElementById('issueForm').addEventListener('submit', function() {
+        console.log('Issue form submitted');
+    });
+
+    document.getElementById('answerForm').addEventListener('submit', function() {
+        console.log('Answer form submitted');
+    });
+
+    // Log when actions are performed
+    const originalShowAnswerForm = showAnswerForm;
+    showAnswerForm = function(issueId, issueNumber) {
+        console.log(`Opening answer form for issue #${issueNumber}`);
+        originalShowAnswerForm(issueId, issueNumber);
+    };
+
+    const originalDeleteIssue = deleteIssue;
+    deleteIssue = function(issueId, issueNumber) {
+        console.log(`Deleting issue #${issueNumber}`);
+        originalDeleteIssue(issueId, issueNumber);
+    };
+</script>
 </body>
 </html>
