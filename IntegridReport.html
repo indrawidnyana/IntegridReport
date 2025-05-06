@@ -575,6 +575,7 @@
                 modules: {
                     toolbar: [
                         ['bold', 'italic', 'underline'],    // Include only basic formatting
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }]  // Added list options
                     ]
                 },
                 placeholder: 'Enter your question here...',
@@ -587,6 +588,7 @@
                     modules: {
                         toolbar: [
                             ['bold', 'italic', 'underline'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }]  // Added list options
                         ],
                         clipboard: {
                             matchVisual: false  // Helps maintain line breaks
@@ -897,11 +899,11 @@
                                     <td class="px-4 py-2 border border-gray-300">${issue.issue_number}</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.period}</td>
                                     <td class="px-4 py-2 border border-gray-300 company-column">${issue.company}</td>
-                                    <td class="px-4 py-2 border border-gray-300 question-column" style="white-space: pre-wrap;">${issue.question}</td>
+                                    <td class="px-4 py-2 border border-gray-300 question-column" id="question-${issue.id}">Loading...</td>
                                     <td class="px-4 py-2 border border-gray-300">${issue.question_by}</td>
                                     <td class="px-4 py-2 border border-gray-300 text-center">${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block text-sm">Here</a>` : 'No attachment'}</td>
                                     <td class="px-4 py-2 border border-gray-300 text-center"><span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></td>
-                                    <td class="px-4 py-2 border border-gray-300 answer-column" style="white-space: pre-wrap;">${issue.answer ? issue.answer : 'Awaiting Answer'}</td>
+                                    <td class="px-4 py-2 border border-gray-300 answer-column" id="answer-${issue.id}">Loading...</td>
                                     <td class="px-4 py-2 border border-gray-300 text-center">${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block text-sm">Here</a>` : 'No attachment'}</td>
                                     <td class="action-column border border-gray-300 text-center">
                                         <div class="flex flex-col items-center justify-center w-full">
@@ -921,6 +923,19 @@
             </div>`;
 
             reportListDiv.innerHTML = reportListHTML;
+            
+            // After the table is rendered, set the innerHTML of the cells to properly render the HTML
+            currentIssues.forEach(issue => {
+                const questionCell = document.getElementById(`question-${issue.id}`);
+                if (questionCell) {
+                    questionCell.innerHTML = issue.question;
+                }
+                
+                const answerCell = document.getElementById(`answer-${issue.id}`);
+                if (answerCell) {
+                    answerCell.innerHTML = issue.answer || 'Awaiting Answer';
+                }
+            });
             
             // Update pagination
             updatePagination(totalPages, totalIssues);
@@ -1075,6 +1090,9 @@
                 document.getElementById('company').value = '';
                 document.querySelector('#picFormDropdown .selected-text').textContent = 'Select PIC';
                 document.getElementById('questionBy').value = '';
+                
+                // Reset Quill editor
+                quill.root.innerHTML = '';
                 
                 await loadIssues();
                 
@@ -1259,17 +1277,23 @@
                         <p><span class="font-semibold">Issue Number:</span> ${issue.issue_number}</p>
                         <p><span class="font-semibold">Period:</span> ${issue.period}</p>
                         <p><span class="font-semibold">Company:</span> ${issue.company}</p>
-                        <p><span class="font-semibold">Question:</span> <div class="preserve-linebreaks" style="white-space: pre-wrap;">${issue.question}</div></p>
+                        <p><span class="font-semibold">Question:</span></p>
+                        <div id="response-question" class="preserve-linebreaks mt-2 pl-4"></div>
                         <p><span class="font-semibold">Question By (PIC):</span> ${issue.question_by}</p>
                         <p><span class="font-semibold">Question Attachment:</span> ${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</p>
                     </div>
                     <div class="mb-4 border-t border-gray-200 pt-4">
-                        <p><span class="font-semibold">Answer:</span> <div class="preserve-linebreaks" style="white-space: pre-wrap;">${issue.answer ? issue.answer : 'Awaiting Answer'}</div></p>
+                        <p><span class="font-semibold">Answer:</span></p>
+                        <div id="response-answer" class="preserve-linebreaks mt-2 pl-4"></div>
                         <p class="flex items-center"><span class="font-semibold">Answer Attachment:</span> <span class="ml-2">${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block text-sm">Here</a>` : 'No attachment'}</span></p>
                     </div>
                     <div class="mb-4 border-t border-gray-200 pt-4">
                         <p><span class="font-semibold">Status:</span> <span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></p>
                     </div>`;
+                
+                // Set the HTML content for question and answer
+                document.getElementById('response-question').innerHTML = issue.question;
+                document.getElementById('response-answer').innerHTML = issue.answer || 'Awaiting Answer';
             } else {
                 responseDiv.innerHTML = `<p>No issue found with issue number ${issueNumber}</p>`;
             }
