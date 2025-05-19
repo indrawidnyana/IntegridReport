@@ -405,7 +405,7 @@
     </div>
 
     <div class="filter-container bg-white rounded-lg shadow-md p-6 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Month</h2>
                 <div class="custom-dropdown" id="monthFilterDropdown">
@@ -442,6 +442,25 @@
                         </div>
                     </div>
                     <input type="hidden" id="companyFilter" name="companyFilter">
+                </div>
+            </div>
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Status</h2>
+                <div class="custom-dropdown" id="statusFilterDropdown">
+                    <button type="button" class="dropdown-btn">
+                        <span class="selected-text">All Statuses</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search..." class="dropdown-search">
+                        </div>
+                        <div class="dropdown-options">
+                            <!-- Status filter options will be populated here -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="statusFilter" name="statusFilter">
                 </div>
             </div>
         </div>
@@ -560,6 +579,9 @@
         
         const picList = ["Esa", "Bayu", "Eka", "Marcel", "Indra"];
         
+        // Status list for the status filter
+        const statusList = ["All Statuses", "NEW / OPEN", "ANSWERED"];
+        
         // Initialize variables
         let issues = [];
         let currentPage = 1;
@@ -626,6 +648,17 @@
                     document.getElementById('companyFilter').value = "";
                 } else {
                     document.getElementById('companyFilter').value = value;
+                }
+                currentPage = 1; // Reset to first page when filter changes
+                updateReportList();
+            });
+            
+            // Initialize status filter dropdown
+            initDropdown('statusFilterDropdown', statusList, false, (value) => {
+                if (value === "All Statuses") {
+                    document.getElementById('statusFilter').value = "";
+                } else {
+                    document.getElementById('statusFilter').value = value;
                 }
                 currentPage = 1; // Reset to first page when filter changes
                 updateReportList();
@@ -783,9 +816,10 @@
         function applyFilters(issue) {
             const selectedMonth = document.getElementById('monthFilter').value;
             const selectedCompany = document.getElementById('companyFilter').value;
+            const selectedStatus = document.getElementById('statusFilter').value;
             
-            // If both filters are empty, return all issues
-            if (!selectedMonth && !selectedCompany) {
+            // If all filters are empty, return all issues
+            if (!selectedMonth && !selectedCompany && !selectedStatus) {
                 return true;
             }
             
@@ -796,6 +830,11 @@
             
             // Apply company filter
             if (selectedCompany && issue.company !== selectedCompany) {
+                return false;
+            }
+            
+            // Apply status filter
+            if (selectedStatus && issue.status !== selectedStatus) {
                 return false;
             }
             
