@@ -984,53 +984,81 @@
             });
         }
         
-        // Update pagination controls
-        function updatePagination(totalPages, totalItems) {
-            const paginationContainer = document.getElementById('paginationContainer');
-            const pageNumbersContainer = document.getElementById('pageNumbers');
-            const pageInput = document.getElementById('pageInput');
-            const totalPagesDisplay = document.getElementById('totalPagesDisplay');
-            
-            // Show pagination container if there are items
-            if (totalItems > 0) {
-                paginationContainer.style.display = 'flex';
-            } else {
-                paginationContainer.style.display = 'none';
-                return;
-            }
-            
-            // Update total pages display
-            totalPagesDisplay.textContent = `/ ${totalPages}`;
-            pageInput.value = currentPage;
-            
-            // Clear existing page numbers
-            pageNumbersContainer.innerHTML = '';
-            
-            // Generate page numbers
-            for (let i = 1; i <= Math.min(5, totalPages); i++) {
-                const button = document.createElement('button');
-                button.className = `page-number ${i === currentPage ? 'active' : ''}`;
-                button.textContent = i;
-                button.dataset.page = i;
-                button.addEventListener('click', function() {
-                    currentPage = parseInt(this.dataset.page);
-                    updateReportList();
-                });
-                pageNumbersContainer.appendChild(button);
-            }
-            
-            // Update navigation button states
-            const firstPageBtn = document.getElementById('firstPageBtn');
-            const prevPageBtn = document.getElementById('prevPageBtn');
-            const nextPageBtn = document.getElementById('nextPageBtn');
-            const lastPageBtn = document.getElementById('lastPageBtn');
-            
-            // Add disabled class to buttons when needed
-            firstPageBtn.classList.toggle('disabled', currentPage === 1);
-            prevPageBtn.classList.toggle('disabled', currentPage === 1);
-            nextPageBtn.classList.toggle('disabled', currentPage === totalPages);
-            lastPageBtn.classList.toggle('disabled', currentPage === totalPages);
+// Update pagination controls
+function updatePagination(totalPages, totalItems) {
+    const paginationContainer = document.getElementById('paginationContainer');
+    const pageNumbersContainer = document.getElementById('pageNumbers');
+    const pageInput = document.getElementById('pageInput');
+    const totalPagesDisplay = document.getElementById('totalPagesDisplay');
+    
+    // Show pagination container if there are items
+    if (totalItems > 0) {
+        paginationContainer.style.display = 'flex';
+    } else {
+        paginationContainer.style.display = 'none';
+        return;
+    }
+    
+    // Update total pages display
+    totalPagesDisplay.textContent = `/ ${totalPages}`;
+    pageInput.value = currentPage;
+    
+    // Clear existing page numbers
+    pageNumbersContainer.innerHTML = '';
+    
+    // Calculate which page numbers to show (dynamic pagination)
+    let startPage, endPage;
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+        // If total pages is less than or equal to max visible, show all pages
+        startPage = 1;
+        endPage = totalPages;
+    } else {
+        // Calculate start and end page for dynamic pagination
+        const halfVisible = Math.floor(maxVisiblePages / 2);
+        
+        if (currentPage <= halfVisible) {
+            // Near the beginning
+            startPage = 1;
+            endPage = maxVisiblePages;
+        } else if (currentPage + halfVisible >= totalPages) {
+            // Near the end
+            startPage = totalPages - maxVisiblePages + 1;
+            endPage = totalPages;
+        } else {
+            // In the middle
+            startPage = currentPage - halfVisible;
+            endPage = currentPage + halfVisible;
         }
+    }
+    
+    // Generate page numbers
+    for (let i = startPage; i <= endPage; i++) {
+        const button = document.createElement('button');
+        button.className = `page-number ${i === currentPage ? 'active' : ''}`;
+        button.textContent = i;
+        button.dataset.page = i;
+        button.addEventListener('click', function() {
+            currentPage = parseInt(this.dataset.page);
+            updateReportList();
+        });
+        pageNumbersContainer.appendChild(button);
+    }
+    
+    // Update navigation button states
+    const firstPageBtn = document.getElementById('firstPageBtn');
+    const prevPageBtn = document.getElementById('prevPageBtn');
+    const nextPageBtn = document.getElementById('nextPageBtn');
+    const lastPageBtn = document.getElementById('lastPageBtn');
+    
+    // Add disabled class to buttons when needed
+    firstPageBtn.classList.toggle('disabled', currentPage === 1);
+    prevPageBtn.classList.toggle('disabled', currentPage === 1);
+    nextPageBtn.classList.toggle('disabled', currentPage === totalPages);
+    lastPageBtn.classList.toggle('disabled', currentPage === totalPages);
+}
+
 
         // Handle issue form submission
         document.getElementById('issueForm').addEventListener('submit', async function(e) {
