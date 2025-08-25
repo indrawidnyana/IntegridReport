@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrid Tax Issue Reporting System</title>
+    <link rel="icon" href="/favico.png" type="image/x-icon">
+    <link rel="shortcut icon" href="/favico.png" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Supabase JS Client -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2.38.4/dist/umd/supabase.js"></script>
+    <!-- Add Quill Rich Text Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .table-responsive table {
+            min-width: 800px;
+        }
+        
+        /* Custom Dropdown Styles */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        
+        .dropdown-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px 15px;
+            background-color: white; /* Changed to white */
+            color: #4b5563; /* Text color changed to gray */
+            border: 1px solid #d1d5db; /* Added border */
+            border-radius: 0.375rem;
+            cursor: pointer;
+            text-align: left;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            width: 100%;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 10;
+            border: 1px solid #f1f1f1;
+            border-radius: 0.375rem;
+            margin-top: 2px;
+        }
+        
+        .dropdown-content.show {
+            display: block;
+        }
+        
+        .search-container {
+            padding: 10px;
+            border-bottom: 1px solid #f1f1f1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-container input {
+            width: 100%;
+            border: none;
+            padding: 5px;
+            outline: none;
+        }
+        
+        .search-icon {
+            color: #aaa;
+            margin-right: 10px;
+        }
+        
+        .dropdown-options {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #3b82f6;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Action Button Styles */
+        .action-column {
+            min-width: 150px;
+            width: 150px;
+            padding: 4px;
+            vertical-align: middle;
+        }
+
+        .action-header {
+            text-align: center;
+            font-weight: bold;
+            background-color: #f3f4f6;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        /* Add styling for the action column title */
+        th.action-column {
+            background-color: #f3f4f6;
+            font-weight: bold;
+        }
+
+        .action-button {
+            width: 100%;
+            min-height: 44px;
+            margin: 4px auto;
+            padding: 10px 15px;
+            text-align: center;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            display: block;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            max-width: 150px;
+        }
+
+        .edit-btn {
+            background-color: #f7ca18;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: #e0b50d;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .answer-btn {
+            background-color: #3498db;
+        }
+
+        .answer-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        /* Add these styles for preserving line breaks */
+        .preserve-linebreaks {
+            white-space: pre-line !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        /* More column width controls */
+        .question-column, .answer-column {
+            max-width: 350px; /* Same width for both question and answer */
+            white-space: pre-wrap !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .company-column {
+            max-width: 180px;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        
+        /* Pagination styles */
+        .pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        /* Quill editor styles */
+        #editor-container {
+            height: 150px;
+        }
+        
+        /* Fix for Quill toolbar */
+        .ql-toolbar.ql-snow {
+            border-top-left-radius: 0.375rem;
+            border-top-right-radius: 0.375rem;
+        }
+        
+        .ql-container.ql-snow {
+            border-bottom-left-radius: 0.375rem;
+            border-bottom-right-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            border-top: none;
+        }
+        
+        /* When Quill is focused */
+        .ql-container.ql-snow:focus-within {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+        }
+        
+        .pagination {
+            display: flex;
+            align-items: center;
+        }
+        
+        .page-number {
+            min-width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 4px;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            border-radius: 0.375rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .page-number.active {
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 9999px;
+        }
+        
+        .nav-button {
+            min-width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 4px;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            border-radius: 0.375rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-button:hover, .page-number:hover {
+            background-color: #e5e7eb;
+        }
+        
+        .nav-button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .page-input-container {
+            display: flex;
+            align-items: center;
+            margin-left: 16px;
+        }
+        
+        .page-input {
+            width: 60px;
+            height: 36px;
+            text-align: center;
+            margin: 0 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0 8px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-6 rounded-lg">
+    <h1 class="text-4xl font-bold text-center text-blue-700 mb-8 border-2 border-blue-400 rounded-md p-4">Integrid Tax Issue Reporting System</h1>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8 border-2 border-gray-300">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 underline">Important Information</h2>
+        <ol class="list-decimal list-inside space-y-2">
+            <li class="flex items-start">
+                <span class="font-semibold mr-1">PLEASE UPLOAD THE QUESTION ATTACHMENT FILE ON THIS DRIVE :</span> 
+                    <a href="https://drive.google.com/drive/folders/1TtYH6e1c3nIP-uHX_mPEqcVKIjNr2-iT?usp=drive_link" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">
+                        Here
+                    </a>
+                
+            </li>
+            <li class="flex items-start">
+                <span class="font-semibold mr-1">PLEASE UPLOAD THE ANSWER ATTACHMENT FILE ON THIS DRIVE :</span>
+                    <a href="https://drive.google.com/drive/folders/1ihFleQ0ONU4S9C-cjmlkJZov1RuvYjvk?usp=drive_link" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">
+                        Here
+                    </a>
+                
+            </li>
+        </ol>
+    </div>
+
+    <div class="form-container bg-white rounded-lg shadow-md p-8 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Report an Issue</h2>
+        <form id="issueForm" class="space-y-4">
+            <div>
+                <label for="period" class="block text-gray-700 text-sm font-bold mb-2">Period:</label>
+                <div class="custom-dropdown" id="periodFormDropdown">
+                    <button type="button" class="dropdown-btn">
+                        <span class="selected-text">Select Month</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search..." class="dropdown-search">
+                        </div>
+                        <div class="dropdown-options">
+                            <!-- Options will be populated here -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="period" name="period" required>
+                </div>
+            </div>
+            <div>
+                <label for="company" class="block text-gray-700 text-sm font-bold mb-2">Company:</label>
+                <div class="custom-dropdown" id="companyFormDropdown">
+                    <button type="button" class="dropdown-btn">
+                        <span class="selected-text">Select Company</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search..." class="dropdown-search">
+                        </div>
+                        <div class="dropdown-options">
+                            <!-- Options will be populated here -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="company" name="company" required>
+                </div>
+            </div>
+            <div>
+                <label for="question" class="block text-gray-700 text-sm font-bold mb-2">Question:</label>
+                <!-- Replace textarea with div for Quill editor -->
+                <div id="editor-container" class="h-32 mb-2">
+                    <!-- Quill editor will be initialized here -->
+                </div>
+                <input type="hidden" id="question" name="question" required>
+            </div>
+            <div>
+                <label for="questionBy" class="block text-gray-700 text-sm font-bold mb-2">Question By (PIC):</label>
+                <div class="custom-dropdown" id="picFormDropdown">
+                    <button type="button" class="dropdown-btn">
+                        <span class="selected-text">Select PIC</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search..." class="dropdown-search">
+                        </div>
+                        <div class="dropdown-options">
+                            <!-- Options will be populated here -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="questionBy" name="questionBy" required>
+                </div>
+            </div>
+            <div>
+                <label for="attachment" class="block text-gray-700 text-sm font-bold mb-2">Question Attachment (Link):</label>
+                <input type="url" id="attachment" name="attachment" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Submit Issue</button>
+        </form>
+    </div>
+
+    <div class="filter-container bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Month</h2>
+                <div class="custom-dropdown" id="monthFilterDropdown">
+                    <button type="button" class="dropdown-btn">
+                        <span class="selected-text">All Months</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search..." class="dropdown-search">
+                        </div>
+                        <div class="dropdown-options">
+                            <!-- Filter options will be populated here -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="monthFilter" name="monthFilter">
+                </div>
+            </div>
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Company</h2>
+                <div class="custom-dropdown" id="companyFilterDropdown">
+                    <button type="button" class="dropdown-btn">
+                        <span class="selected-text">All Companies</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search..." class="dropdown-search">
+                        </div>
+                        <div class="dropdown-options">
+                            <!-- Filter options will be populated here -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="companyFilter" name="companyFilter">
+                </div>
+            </div>
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Status</h2>
+                <div class="custom-dropdown" id="statusFilterDropdown">
+                    <button type="button" class="dropdown-btn">
+                        <span class="selected-text">All Statuses</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="Search..." class="dropdown-search">
+                        </div>
+                        <div class="dropdown-options">
+                            <!-- Status filter options will be populated here -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="statusFilter" name="statusFilter">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-list-container bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="flex justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-800">Reported Issues</h2>
+            <div>
+                <button id="exportButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2">
+                    Export Data to CSV
+                </button>
+                <button id="refreshButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Refresh Data
+                </button>
+            </div>
+        </div>
+        <div id="reportList" class="table-responsive">
+            <div class="flex justify-center items-center h-24">
+                <div class="spinner"></div>
+                <p class="ml-3">Loading data...</p>
+            </div>
+        </div>
+        
+        <!-- Pagination container -->
+        <div id="paginationContainer" class="pagination-container" style="display: none;">
+            <div class="pagination">
+                <button id="firstPageBtn" class="nav-button">«</button>
+                <button id="prevPageBtn" class="nav-button">‹</button>
+                <div id="pageNumbers" class="flex"></div>
+                <button id="nextPageBtn" class="nav-button">›</button>
+                <button id="lastPageBtn" class="nav-button">»</button>
+            </div>
+            <div class="page-input-container">
+                <span>Ke halaman</span>
+                <input type="text" id="pageInput" class="page-input">
+                <span id="totalPagesDisplay">/ 1</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="response-container bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Response</h2>
+        <div id="response" class="border rounded p-4 text-gray-700">
+            <p>Awaiting issue submission...</p>
+        </div>
+    </div>
+
+    <div class="answer-form-container bg-white rounded-lg shadow-md p-8 mt-6" style="display: none;">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Answer Issue</h2>
+        <form id="answerForm" class="space-y-4">
+            <input type="hidden" id="issueId" name="issueId">
+            <div>
+                <label for="issueNumber" class="block text-gray-700 text-sm font-bold mb-2">Issue Number:</label>
+                <input type="text" id="issueNumber" name="issueNumber" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required readonly>
+            </div>
+            <div>
+                <label for="answer" class="block text-gray-700 text-sm font-bold mb-2">Answer:</label>
+                <!-- Replace textarea with div for Quill editor -->
+                <div id="answer-editor-container" class="h-32 mb-2">
+                    <!-- Quill editor will be initialized here -->
+                </div>
+                <input type="hidden" id="answer" name="answer" required>
+            </div>
+            <div>
+                <label for="answerAttachment" class="block text-gray-700 text-sm font-bold mb-2">Answer Attachment (Link):</label>
+                <input type="url" id="answerAttachment" name="answerAttachment" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+            <div class="flex justify-between">
+                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Submit Answer</button>
+                <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cancel-answer-form">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Initialize Supabase client
+        const SUPABASE_URL = 'https://odgvwsqkunfyvmpohaqv.supabase.co'; // Replace with your Supabase URL
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kZ3Z3c3FrdW5meXZtcG9oYXF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NzQ0NjEsImV4cCI6MjA3MTI1MDQ2MX0.vu4GIEh9444tN6e9pSnc6gNi2rLBp0CZotuoqSMEGB8'; // Replace with your Supabase anon key
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Data lists for dropdowns
+        const months = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        ];
+        
+        const companyList = [
+            "The Bluejay", "Barong Family", "Sababa - Elno Noli Putih", "Karisa Lifestyle",
+            "Indah Nusa Timur", "INTEGRID", "Gelareh Design", "Sunkiss Restaurant",
+            "Rent Surfboard Bali", "Improvea Maju Solusi", "Trio Rukun Sejahtera",
+            "Ola Casa Bali", "Moonkey Group", "Anugrah Pangan Jaya (CIBO)", "Liva",
+            "You Spa Bali", "Pemandangan HIjau Bali", "Kayu Living Bali",
+            "Serenity Property Bali", "Weddingup Event Organizer", "Bienaime Samyn Investment",
+            "Bali Couple Retreats", "Denpasar Indah Seruni", "Maza Bali Investing",
+            "Martin Family Agency", "Masa Depan Utama Lestari", "Sportva",
+            "JGM Group Management", "Naoli Eliam Group", "Evasion Villa Bali",
+            "Pauline & Luke Consulting", "Bali Real Estate - Anjuna Bay", "HMZ Digital Agency",
+            "Shade Agency Bali", "Mid Night Sun", "Neala Nature Stays",
+            "Deprince Global Services", "Lucky Cat Land", "Only Loading Asia",
+            "Women Bali Bahagia", "Sunder Jupiter Bali", "Aanoukis Tropix Retail",
+            "Bybali Build Consulting", "Snaaack Padang Bai", "The Naluri Bali",
+            "Hocus Pocus Prod", "Kim Advantage Consulting", "Bejoi Design Bali",
+            "Nyata Consulting Bali", "Tran Manh Sung", "The Blackless Lovers",
+            "Maju Operation & Development", "Dragon Indonesia Exotics", "Elodie Mattei Group",
+            "Chatelain Advisory Investment", "Cabana Bali Style", "Good Move",
+            "Slow Nomad Living", "The Agency Bali", "Esensi Digital Agency",
+            "LNH Reality and Flavor", "MYMS", "Modern Groove Reverie",
+            "PT. LUNES SACREES BALI", "PT. JOY BIRD INVEST", "PT. WEAREBRAND PRODUCTION DIGITAL",
+            "PT. BEBAS EXPERIENCE GROUP", "PT. THE SUNRISE PRODUCTION", "THE BACKLESS LOVERS",
+            "PT THE CENTURY GROUP", "BALI ISLAND BOUNCE", "PT BALI JADAYO IMMO",
+            "PT DEL VALLE GURRUTXAGA", "PT THE SURFER GUIDE BALI", "PT CALA BALI INVESTMENT",
+            "PT LEREGARD PRO BALI", "PT CHUNK THE FUTURE", "PT THE BALI PARADIS",
+            "PT SEA YOU BALI", "THE DOG PARADISE", "NICO PRODUCTION", "PT HORIZON STUDIO DESIGN", 
+            "PT THIMI MANIS KESENANGAN", "LOS PRIMOS", "COWORKING SPACES CONCEPT", "PT SCANDI BALI ESTATE", "RUMAH IDE CEMERLANG", 
+            "JAYA INDAH DEKORASI", "GAN EDEN", "Palikua Nyanyi Investment", "THE BAMBOU CAFE"];
+        
+        const picList = ["Esa", "Bayu", "Eka", "Marcel", "Indra"];
+        
+        // Status list for the status filter
+        const statusList = ["All Statuses", "NEW / OPEN", "ANSWERED"];
+        
+        // Initialize variables
+        let issues = [];
+        let currentPage = 1;
+        const issuesPerPage = 5; // Strictly 5 items per page
+        
+        // Initialize Quill editor
+        let quill;
+        let answerQuill;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Quill rich text editor for questions
+            quill = new Quill('#editor-container', {
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline'],    // Include only basic formatting
+                    ]
+                },
+                placeholder: 'Enter your question here...',
+                theme: 'snow'  // snow is a clean looking theme
+            });
+            
+            // Initialize Quill rich text editor for answers (when needed)
+            if (document.getElementById('answer-editor-container')) {
+                answerQuill = new Quill('#answer-editor-container', {
+                    modules: {
+                        toolbar: [
+                            ['bold', 'italic', 'underline'],
+                        ],
+                        clipboard: {
+                            matchVisual: false  // Helps maintain line breaks
+                        }
+                    },
+                    placeholder: 'Enter your answer here...',
+                    theme: 'snow'
+                });
+            }
+            
+            // Initialize custom dropdowns
+            initDropdown('periodFormDropdown', months, true, (value) => {
+                document.getElementById('period').value = value;
+            });
+            
+            initDropdown('companyFormDropdown', companyList, true, (value) => {
+                document.getElementById('company').value = value;
+            });
+            
+            initDropdown('picFormDropdown', picList, true, (value) => {
+                document.getElementById('questionBy').value = value;
+            });
+            
+            // Initialize filter dropdowns
+            initDropdown('monthFilterDropdown', ["All Months"].concat(months), false, (value) => {
+                if (value === "All Months") {
+                    document.getElementById('monthFilter').value = "";
+                } else {
+                    document.getElementById('monthFilter').value = value;
+                }
+                currentPage = 1; // Reset to first page when filter changes
+                updateReportList();
+            });
+            
+            initDropdown('companyFilterDropdown', ["All Companies"].concat(companyList), false, (value) => {
+                if (value === "All Companies") {
+                    document.getElementById('companyFilter').value = "";
+                } else {
+                    document.getElementById('companyFilter').value = value;
+                }
+                currentPage = 1; // Reset to first page when filter changes
+                updateReportList();
+            });
+            
+            // Initialize status filter dropdown
+            initDropdown('statusFilterDropdown', statusList, false, (value) => {
+                if (value === "All Statuses") {
+                    document.getElementById('statusFilter').value = "";
+                } else {
+                    document.getElementById('statusFilter').value = value;
+                }
+                currentPage = 1; // Reset to first page when filter changes
+                updateReportList();
+            });
+            
+            // Add event listeners for pagination
+            document.getElementById('firstPageBtn').addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage = 1;
+                    updateReportList();
+                }
+            });
+            
+            document.getElementById('prevPageBtn').addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updateReportList();
+                }
+            });
+            
+            document.getElementById('nextPageBtn').addEventListener('click', function() {
+                const totalPages = Math.ceil(issues.filter(applyFilters).length / issuesPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updateReportList();
+                }
+            });
+            
+            document.getElementById('lastPageBtn').addEventListener('click', function() {
+                const totalPages = Math.ceil(issues.filter(applyFilters).length / issuesPerPage);
+                if (currentPage < totalPages) {
+                    currentPage = totalPages;
+                    updateReportList();
+                }
+            });
+            
+            // Add event listener for page input
+            document.getElementById('pageInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const totalPages = Math.ceil(issues.filter(applyFilters).length / issuesPerPage);
+                    const pageNum = parseInt(this.value);
+                    if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+                        currentPage = pageNum;
+                        updateReportList();
+                    } else {
+                        alert(`Please enter a valid page number between 1 and ${totalPages}`);
+                        this.value = currentPage;
+                    }
+                }
+            });
+            
+            loadIssues();
+            
+            // Add event listeners for buttons
+            document.getElementById('exportButton').addEventListener('click', exportToCSV);
+            document.getElementById('refreshButton').addEventListener('click', loadIssues);
+        });
+        
+        // Initialize custom dropdown
+        function initDropdown(dropdownId, options, isRequired, onSelect) {
+            const dropdown = document.getElementById(dropdownId);
+            const btn = dropdown.querySelector('.dropdown-btn');
+            const content = dropdown.querySelector('.dropdown-content');
+            const searchInput = content.querySelector('.dropdown-search');
+            const optionsContainer = content.querySelector('.dropdown-options');
+            const selectedText = btn.querySelector('.selected-text');
+            
+            // Populate dropdown options
+            populateDropdownOptions(optionsContainer, options, (value) => {
+                selectedText.textContent = value;
+                onSelect(value);
+                content.classList.remove('show');
+            });
+            
+            // Toggle dropdown
+            btn.addEventListener('click', function() {
+                content.classList.toggle('show');
+                if (content.classList.contains('show')) {
+                    searchInput.focus();
+                    // Reset search each time
+                    searchInput.value = '';
+                    filterDropdownOptions(optionsContainer, '');
+                }
+            });
+            
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                filterDropdownOptions(optionsContainer, this.value);
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target)) {
+                    content.classList.remove('show');
+                }
+            });
+            
+            // Validate required field if needed
+            if (isRequired) {
+                // This is for form validation
+                // You might need to add more logic based on your form submission needs
+            }
+        }
+        
+        // Populate dropdown options
+        function populateDropdownOptions(container, options, onSelect) {
+            container.innerHTML = '';
+            options.forEach(option => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.textContent = option;
+                item.addEventListener('click', () => onSelect(option));
+                container.appendChild(item);
+            });
+        }
+        
+        // Filter dropdown options
+        function filterDropdownOptions(container, searchText) {
+            const items = container.querySelectorAll('.dropdown-item');
+            const searchLower = searchText.toLowerCase();
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchLower)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        // Update company filter dropdown based on current issues
+        function updateCompanyFilterDropdown() {
+            // Get unique companies from issues
+            const companies = issues.map(issue => issue.company);
+            const uniqueCompanies = [...new Set(companies)].filter(Boolean).sort();
+            
+            // Update the dropdown options
+            const optionsContainer = document.querySelector('#companyFilterDropdown .dropdown-options');
+            populateDropdownOptions(optionsContainer, ["All Companies"].concat(uniqueCompanies), (value) => {
+                if (value === "All Companies") {
+                    document.getElementById('companyFilter').value = "";
+                } else {
+                    document.getElementById('companyFilter').value = value;
+                }
+                document.querySelector('#companyFilterDropdown .selected-text').textContent = value;
+                document.querySelector('#companyFilterDropdown .dropdown-content').classList.remove('show');
+                currentPage = 1; // Reset to first page when filter changes
+                updateReportList();
+            });
+        }
+
+        // Apply filters to issues
+        function applyFilters(issue) {
+            const selectedMonth = document.getElementById('monthFilter').value;
+            const selectedCompany = document.getElementById('companyFilter').value;
+            const selectedStatus = document.getElementById('statusFilter').value;
+            
+            // If all filters are empty, return all issues
+            if (!selectedMonth && !selectedCompany && !selectedStatus) {
+                return true;
+            }
+            
+            // Apply month filter
+            if (selectedMonth && issue.period !== selectedMonth) {
+                return false;
+            }
+            
+            // Apply company filter
+            if (selectedCompany && issue.company !== selectedCompany) {
+                return false;
+            }
+            
+            // Apply status filter
+            if (selectedStatus && issue.status !== selectedStatus) {
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Load issues from Supabase
+        async function loadIssues() {
+            showLoading();
+            
+            try {
+                // Fetch issues from Supabase
+                const { data, error } = await supabaseClient
+                    .from('tax_issues')
+                    .select('*')
+                    .order('issue_number', { ascending: true });
+                
+                if (error) throw error;
+                
+                issues = data || [];
+                updateReportList();
+                
+                // Update company filter dropdown with current companies
+                updateCompanyFilterDropdown();
+            } catch (error) {
+                console.error('Error loading issues:', error);
+                document.getElementById('reportList').innerHTML = `
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <span class="block sm:inline"> Failed to load issues. Please try again later.</span>
+                    </div>
+                `;
+            }
+        }
+        
+        // Show loading indicator
+        function showLoading() {
+            document.getElementById('reportList').innerHTML = `
+                <div class="flex justify-center items-center h-24">
+                    <div class="spinner"></div>
+                    <p class="ml-3">Loading data...</p>
+                </div>
+            `;
+            document.getElementById('paginationContainer').style.display = 'none';
+        }
+
+        // Update the report list display
+        function updateReportList() {
+            let reportListDiv = document.getElementById('reportList');
+            
+            if (issues.length === 0) {
+                reportListDiv.innerHTML = '<p>No issues reported yet.</p>';
+                document.getElementById('paginationContainer').style.display = 'none';
+                return;
+            }
+
+            // Filter issues based on selected filters
+            let filteredIssues = issues.filter(applyFilters);
+            
+            // Calculate pagination
+            const totalIssues = filteredIssues.length;
+            const totalPages = Math.max(1, Math.ceil(totalIssues / issuesPerPage));
+            
+            // Ensure current page is valid
+            if (currentPage > totalPages) {
+                currentPage = totalPages;
+            }
+            if (currentPage < 1) {
+                currentPage = 1;
+            }
+            
+            // Get current page items
+            const startIndex = (currentPage - 1) * issuesPerPage;
+            const endIndex = Math.min(startIndex + issuesPerPage, totalIssues);
+            const currentIssues = filteredIssues.slice(startIndex, endIndex);
+
+            // Generate table HTML
+            let reportListHTML = `
+            <div class="table-responsive">
+                <table class="min-w-full border-collapse border border-gray-300">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Issue #</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Period</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left company-column">Company</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left question-column">Question</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Question By (PIC)</th>
+                            <th class="px-4 py-2 border border-gray-300 text-center">Attachment</th>
+                            <th class="px-4 py-2 border border-gray-300 text-center">Status</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left answer-column">Answer</th>
+                            <th class="px-4 py-2 border border-gray-300 text-center">Answer Attachment</th>
+                            <th class="action-column border border-gray-300 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        ${currentIssues.map((issue) => {
+                            return `
+                                <tr>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.issue_number}</td>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.period}</td>
+                                    <td class="px-4 py-2 border border-gray-300 company-column">${issue.company}</td>
+                                    <td class="px-4 py-2 border border-gray-300 question-column" style="white-space: pre-wrap;">${issue.question}</td>
+                                    <td class="px-4 py-2 border border-gray-300">${issue.question_by}</td>
+                                    <td class="px-4 py-2 border border-gray-300 text-center">${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block text-sm">Here</a>` : 'No attachment'}</td>
+                                    <td class="px-4 py-2 border border-gray-300 text-center"><span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></td>
+                                    <td class="px-4 py-2 border border-gray-300 answer-column" style="white-space: pre-wrap;">${issue.answer ? issue.answer : 'Awaiting Answer'}</td>
+                                    <td class="px-4 py-2 border border-gray-300 text-center">${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block text-sm">Here</a>` : 'No attachment'}</td>
+                                    <td class="action-column border border-gray-300 text-center">
+                                        <div class="flex flex-col items-center justify-center w-full">
+                                            ${issue.answer ? 
+                                            `<button class="action-button edit-btn edit-answer-button w-full mx-auto" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Edit Answer</button>
+                                            <button class="action-button delete-btn delete-button w-full mx-auto" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Delete</button>` 
+                                            : 
+                                            `<button class="action-button answer-btn answer-button w-full mx-auto" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Answer Issue</button>
+                                            <button class="action-button delete-btn delete-button w-full mx-auto" data-id="${issue.id}" data-issue-number="${issue.issue_number}">Delete</button>`}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+
+            reportListDiv.innerHTML = reportListHTML;
+            
+            // Update pagination
+            updatePagination(totalPages, totalIssues);
+
+            // Attach event listeners to the buttons
+            document.querySelectorAll('.answer-button, .edit-answer-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const issueId = this.dataset.id;
+                    const issueNumber = parseInt(this.dataset.issueNumber);
+                    showAnswerForm(issueId, issueNumber);
+                });
+            });
+            
+            // Add event listeners for delete buttons
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const issueId = this.dataset.id;
+                    const issueNumber = parseInt(this.dataset.issueNumber);
+                    if (confirm(`Are you sure you want to delete issue #${issueNumber}? This cannot be undone.`)) {
+                        deleteIssue(issueId, issueNumber);
+                    }
+                });
+            });
+        }
+        
+// Update pagination controls
+function updatePagination(totalPages, totalItems) {
+    const paginationContainer = document.getElementById('paginationContainer');
+    const pageNumbersContainer = document.getElementById('pageNumbers');
+    const pageInput = document.getElementById('pageInput');
+    const totalPagesDisplay = document.getElementById('totalPagesDisplay');
+    
+    // Show pagination container if there are items
+    if (totalItems > 0) {
+        paginationContainer.style.display = 'flex';
+    } else {
+        paginationContainer.style.display = 'none';
+        return;
+    }
+    
+    // Update total pages display
+    totalPagesDisplay.textContent = `/ ${totalPages}`;
+    pageInput.value = currentPage;
+    
+    // Clear existing page numbers
+    pageNumbersContainer.innerHTML = '';
+    
+    // Calculate which page numbers to show (dynamic pagination)
+    let startPage, endPage;
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+        // If total pages is less than or equal to max visible, show all pages
+        startPage = 1;
+        endPage = totalPages;
+    } else {
+        // Calculate start and end page for dynamic pagination
+        const halfVisible = Math.floor(maxVisiblePages / 2);
+        
+        if (currentPage <= halfVisible) {
+            // Near the beginning
+            startPage = 1;
+            endPage = maxVisiblePages;
+        } else if (currentPage + halfVisible >= totalPages) {
+            // Near the end
+            startPage = totalPages - maxVisiblePages + 1;
+            endPage = totalPages;
+        } else {
+            // In the middle
+            startPage = currentPage - halfVisible;
+            endPage = currentPage + halfVisible;
+        }
+    }
+    
+    // Generate page numbers
+    for (let i = startPage; i <= endPage; i++) {
+        const button = document.createElement('button');
+        button.className = `page-number ${i === currentPage ? 'active' : ''}`;
+        button.textContent = i;
+        button.dataset.page = i;
+        button.addEventListener('click', function() {
+            currentPage = parseInt(this.dataset.page);
+            updateReportList();
+        });
+        pageNumbersContainer.appendChild(button);
+    }
+    
+    // Update navigation button states
+    const firstPageBtn = document.getElementById('firstPageBtn');
+    const prevPageBtn = document.getElementById('prevPageBtn');
+    const nextPageBtn = document.getElementById('nextPageBtn');
+    const lastPageBtn = document.getElementById('lastPageBtn');
+    
+    // Add disabled class to buttons when needed
+    firstPageBtn.classList.toggle('disabled', currentPage === 1);
+    prevPageBtn.classList.toggle('disabled', currentPage === 1);
+    nextPageBtn.classList.toggle('disabled', currentPage === totalPages);
+    lastPageBtn.classList.toggle('disabled', currentPage === totalPages);
+}
+
+
+        // Handle issue form submission
+        document.getElementById('issueForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Get Quill editor content and set to hidden field
+            document.getElementById('question').value = quill.root.innerHTML;
+            
+            // Validate required fields
+            if (!document.getElementById('period').value) {
+                alert('Please select a period');
+                return;
+            }
+            
+            if (!document.getElementById('company').value) {
+                alert('Please select a company');
+                return;
+            }
+            
+            if (!document.getElementById('questionBy').value) {
+                alert('Please select a PIC');
+                return;
+            }
+            
+            if (!document.getElementById('question').value.trim()) {
+                alert('Please enter a question');
+                return;
+            }
+            
+            // Disable submit button and show loading state
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="flex items-center justify-center"><div class="spinner mr-2" style="width: 20px; height: 20px;"></div>Submitting...</span>';
+            
+            let formData = new FormData(this);
+            let responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = '<p class="text-gray-600">Submitting issue...</p>';
+            
+            try {
+                // Get the highest issue number to determine the next one
+                const { data: maxIssueNumber, error: maxError } = await supabaseClient
+                    .from('tax_issues')
+                    .select('issue_number')
+                    .order('issue_number', { ascending: false })
+                    .limit(1);
+                
+                if (maxError) throw maxError;
+                
+                const nextIssueNumber = maxIssueNumber && maxIssueNumber.length > 0 
+                    ? maxIssueNumber[0].issue_number + 1 
+                    : 1;
+                
+                // Create new issue object
+                const newIssue = {
+                    issue_number: nextIssueNumber,
+                    period: formData.get('period'),
+                    company: formData.get('company'),
+                    question: formData.get('question'),
+                    question_by: formData.get('questionBy'),
+                    attachment: formData.get('attachment') || null,
+                    status: "NEW / OPEN",
+                    answer: null,
+                    answer_attachment: null
+                };
+                
+                // Insert the new issue into Supabase
+                const { data, error } = await supabaseClient
+                    .from('tax_issues')
+                    .insert([newIssue])
+                    .select();
+                
+                if (error) throw error;
+                
+                // Reset form and dropdowns
+                this.reset();
+                document.querySelector('#periodFormDropdown .selected-text').textContent = 'Select Month';
+                document.getElementById('period').value = '';
+                document.querySelector('#companyFormDropdown .selected-text').textContent = 'Select Company';
+                document.getElementById('company').value = '';
+                document.querySelector('#picFormDropdown .selected-text').textContent = 'Select PIC';
+                document.getElementById('questionBy').value = '';
+                
+                await loadIssues();
+                
+                // Display success response
+                displayResponse(nextIssueNumber);
+                
+                // Show success message
+                responseDiv.innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <strong class="font-bold">Success!</strong>
+                        <span class="block sm:inline"> Issue #${nextIssueNumber} has been created.</span>
+                    </div>
+                    ${responseDiv.innerHTML}
+                `;
+            } catch (error) {
+                console.error('Error submitting issue:', error);
+                if (error.details) console.error('Error details:', error.details);
+                if (error.hint) console.error('Error hint:', error.hint);
+                if (error.code) console.error('Error code:', error.code);
+                responseDiv.innerHTML = `
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <span class="block sm:inline"> Failed to submit issue. Please try again later.</span>
+                    </div>
+                `;
+            } finally {
+                // Re-enable submit button
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            }
+        });
+
+        // Delete an issue
+        async function deleteIssue(issueId, issueNumber) {
+            try {
+                const { error } = await supabaseClient
+                    .from('tax_issues')
+                    .delete()
+                    .eq('id', issueId);
+                
+                if (error) throw error;
+                
+                // Reload issues after deletion
+                await loadIssues();
+                
+                // Update response div
+                document.getElementById('response').innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Success!</strong>
+                        <span class="block sm:inline"> Issue #${issueNumber} has been deleted.</span>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error deleting issue:', error);
+                document.getElementById('response').innerHTML = `
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <span class="block sm:inline"> Failed to delete issue. Please try again later.</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Show answer form
+        function showAnswerForm(issueId, issueNumber) {
+            let answerFormContainer = document.querySelector('.answer-form-container');
+            
+            // Set issue ID and number
+            document.getElementById('issueId').value = issueId;
+            document.getElementById('issueNumber').value = issueNumber;
+            
+            // Find the issue in the array
+            const issueToAnswer = issues.find(issue => issue.id === issueId);
+            if (issueToAnswer) {
+                // Set the answer content to the Quill editor
+                if (issueToAnswer.answer) {
+                    answerQuill.root.innerHTML = issueToAnswer.answer;
+                } else {
+                    answerQuill.root.innerHTML = '';
+                }
+                document.getElementById('answerAttachment').value = issueToAnswer.answer_attachment || '';
+            }
+            
+            answerFormContainer.style.display = 'block';
+            
+            // Add smooth scroll to the answer form container
+            setTimeout(() => {
+                answerFormContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        // Handle cancel button on answer form
+        document.querySelector('.cancel-answer-form').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('.answer-form-container').style.display = 'none';
+            document.getElementById('answerForm').reset();
+        });
+
+        // Handle answer form submission
+        document.getElementById('answerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Get Quill editor content and set to hidden field
+            document.getElementById('answer').value = answerQuill.root.innerHTML;
+            
+            // Disable submit button and show loading state
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="flex items-center justify-center"><div class="spinner mr-2" style="width: 20px; height: 20px;"></div>Submitting...</span>';
+            
+            const issueId = document.getElementById('issueId').value;
+            const issueNumber = parseInt(document.getElementById('issueNumber').value);
+            const answer = document.getElementById('answer').value;
+            const answerAttachment = document.getElementById('answerAttachment').value || null;
+            
+            try {
+                // Update the issue in Supabase
+                const { data, error } = await supabaseClient
+                    .from('tax_issues')
+                    .update({ 
+                        answer: answer,
+                        answer_attachment: answerAttachment,
+                        status: "ANSWERED",
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', issueId)
+                    .select();
+                
+                if (error) throw error;
+                
+                // Reload issues
+                await loadIssues();
+                
+                // Hide the form
+                document.querySelector('.answer-form-container').style.display = 'none';
+                document.getElementById('answerForm').reset();
+                
+                // Display updated issue
+                displayResponse(issueNumber);
+                
+                // Show success message
+                document.getElementById('response').innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <strong class="font-bold">Success!</strong>
+                        <span class="block sm:inline"> Answer for issue #${issueNumber} has been submitted.</span>
+                    </div>
+                    ${document.getElementById('response').innerHTML}
+                `;
+            } catch (error) {
+                console.error('Error submitting answer:', error);
+                document.getElementById('response').innerHTML = `
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <span class="block sm:inline"> Failed to submit answer. Please try again later.</span>
+                    </div>
+                `;
+            } finally {
+                // Re-enable submit button
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            }
+        });
+
+        // Get status color class
+        function getStatusColor(status) {
+            switch (status) {
+                case "NEW / OPEN": return "bg-yellow-200 text-yellow-700";
+                case "ANSWERED": return "bg-green-200 text-green-700";
+                case "CLOSED": return "bg-gray-200 text-gray-700";
+                default: return "bg-gray-200 text-gray-700";
+            }
+        }
+
+        // Display issue details in response area
+        function displayResponse(issueNumber) {
+            let responseDiv = document.getElementById('response');
+            const issue = issues.find(i => i.issue_number === issueNumber);
+
+            if (issue) {
+                responseDiv.innerHTML = `<div class="mb-4">
+                        <p><span class="font-semibold">Issue Number:</span> ${issue.issue_number}</p>
+                        <p><span class="font-semibold">Period:</span> ${issue.period}</p>
+                        <p><span class="font-semibold">Company:</span> ${issue.company}</p>
+                        <p><span class="font-semibold">Question:</span> <div class="preserve-linebreaks" style="white-space: pre-wrap;">${issue.question}</div></p>
+                        <p><span class="font-semibold">Question By (PIC):</span> ${issue.question_by}</p>
+                        <p><span class="font-semibold">Question Attachment:</span> ${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</p>
+                    </div>
+                    <div class="mb-4 border-t border-gray-200 pt-4">
+                        <p><span class="font-semibold">Answer:</span> <div class="preserve-linebreaks" style="white-space: pre-wrap;">${issue.answer ? issue.answer : 'Awaiting Answer'}</div></p>
+                        <p class="flex items-center"><span class="font-semibold">Answer Attachment:</span> <span class="ml-2">${issue.answer_attachment ? `<a href="${issue.answer_attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block text-sm">Here</a>` : 'No attachment'}</span></p>
+                    </div>
+                    <div class="mb-4 border-t border-gray-200 pt-4">
+                        <p><span class="font-semibold">Status:</span> <span class="${getStatusColor(issue.status)} py-1 px-3 rounded-full text-xs font-semibold">${issue.status}</span></p>
+                    </div>`;
+            } else {
+                responseDiv.innerHTML = `<p>No issue found with issue number ${issueNumber}</p>`;
+            }
+        }
+        
+        // Export data to CSV
+        function exportToCSV() {
+            if (issues.length === 0) {
+                alert('No data to export');
+                return;
+            }
+            
+            // Define CSV headers
+            const headers = [
+                'Issue #',
+                'Period',
+                'Company',
+                'Question',
+                'Question By (PIC)',
+                'Attachment',
+                'Status',
+                'Answer',
+                'Answer Attachment',
+                'Date Created',
+                'Date Updated'
+            ];
+            
+            // Map issues to CSV rows
+            const rows = issues.map(issue => [
+                issue.issue_number,
+                issue.period,
+                issue.company,
+                issue.question,
+                issue.question_by,
+                issue.attachment || '',
+                issue.status,
+                issue.answer || '',
+                issue.answer_attachment || '',
+                new Date(issue.created_at).toLocaleString(),
+                issue.updated_at ? new Date(issue.updated_at).toLocaleString() : ''
+            ]);
+            
+            // Combine headers and rows
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+            ].join('\n');
+            
+            // Create a Blob and download link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            
+            // Set download attributes
+            link.setAttribute('href', url);
+            link.setAttribute('download', `tax_issues_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.display = 'none';
+            
+            // Append to body, trigger click, and clean up
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+    
+    <!-- Console Log Viewer -->
+    <div id="consoleViewer" class="fixed bottom-4 right-4 z-50">
+    <!-- Toggle Button -->
+    <button id="toggleConsole" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full shadow-lg">
+        _
+    </button>
+    
+    <!-- Console Output -->
+    <div id="consoleOutput" class="hidden bg-gray-900 text-green-400 p-4 rounded-lg shadow-xl mt-2 w-96 h-64 overflow-auto font-mono text-sm">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-white font-bold">Console Log</span>
+            <button id="clearConsole" class="text-red-500 hover:text-red-400 text-xs">Clear</button>
+        </div>
+        <div id="logContent"></div>
+    </div>
+</div>
+
+<!-- Add this script just before closing body tag -->
+<script>
+    // Console logging override
+    const originalConsole = {
+        log: console.log,
+        error: console.error,
+        warn: console.warn,
+        info: console.info
+    };
+
+    // Function to get client IP address
+    async function getClientIP() {
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            return data.ip;
+        } catch (error) {
+            return 'Unable to get IP';
+        }
+    }
+
+    // Function to get device info
+    function getDeviceInfo() {
+        return {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            vendor: navigator.vendor,
+            language: navigator.language
+        };
+    }
+
+    // Function to add log entry
+    async function addLogEntry(type, args) {
+        const logContent = document.getElementById('logContent');
+        const timestamp = new Date().toLocaleTimeString();
+        const ip = await getClientIP();
+        const deviceInfo = getDeviceInfo();
+        
+        const logEntry = document.createElement('div');
+        logEntry.className = `mb-2 ${type === 'error' ? 'text-red-500' : type === 'warn' ? 'text-yellow-500' : ''}`;
+        
+        const logMessage = Array.from(args).map(arg => 
+            typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+        ).join(' ');
+
+        logEntry.innerHTML = `
+            <div class="text-xs text-gray-500">${timestamp}</div>
+            <div class="text-xs text-blue-400">IP: ${ip}</div>
+            <div class="text-xs text-purple-400">Device: ${deviceInfo.platform}</div>
+            <div>${logMessage}</div>
+        `;
+        
+        logContent.appendChild(logEntry);
+        logContent.scrollTop = logContent.scrollHeight;
+    }
+
+    // Override console methods
+    console.log = function() {
+        originalConsole.log.apply(console, arguments);
+        addLogEntry('log', arguments);
+    };
+    
+    console.error = function() {
+        originalConsole.error.apply(console, arguments);
+        addLogEntry('error', arguments);
+    };
+    
+    console.warn = function() {
+        originalConsole.warn.apply(console, arguments);
+        addLogEntry('warn', arguments);
+    };
+    
+    console.info = function() {
+        originalConsole.info.apply(console, arguments);
+        addLogEntry('info', arguments);
+    };
+
+    // Toggle console viewer
+    document.getElementById('toggleConsole').addEventListener('click', function() {
+        const consoleOutput = document.getElementById('consoleOutput');
+        const isHidden = consoleOutput.classList.contains('hidden');
+        consoleOutput.classList.toggle('hidden');
+        this.textContent = isHidden ? '_' : '_';
+    });
+
+    // Clear console
+    document.getElementById('clearConsole').addEventListener('click', function() {
+        document.getElementById('logContent').innerHTML = '';
+    });
+
+    // Add logging for form submissions and actions
+    document.getElementById('issueForm').addEventListener('submit', function() {
+        console.log('Issue form submitted');
+    });
+
+    document.getElementById('answerForm').addEventListener('submit', function() {
+        console.log('Answer form submitted');
+    });
+
+    // Log when actions are performed
+    const originalShowAnswerForm = showAnswerForm;
+    showAnswerForm = function(issueId, issueNumber) {
+        console.log(`Opening answer form for issue #${issueNumber}`);
+        originalShowAnswerForm(issueId, issueNumber);
+    };
+
+    const originalDeleteIssue = deleteIssue;
+    deleteIssue = function(issueId, issueNumber) {
+        console.log(`Deleting issue #${issueNumber}`);
+        originalDeleteIssue(issueId, issueNumber);
+    };
+</script>
+</body>
+</html>
+
+
+
+
