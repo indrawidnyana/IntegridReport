@@ -578,7 +578,7 @@
             "PT THIMI MANIS KESENANGAN", "LOS PRIMOS", "COWORKING SPACES CONCEPT", "PT SCANDI BALI ESTATE", "RUMAH IDE CEMERLANG", 
             "JAYA INDAH DEKORASI", "GAN EDEN", "Palikua Nyanyi Investment", "THE BAMBOU CAFE"];
         
-        const picList = ["Esa", "Bayu", "Eka", "Marcel", "Indra"];
+        const picList = ["Eva", "Chika", "Novi","Anna", "Marcel", "Indra"];
         
         // Status list for the status filter
         const statusList = ["All Statuses", "NEW / OPEN", "ANSWERED"];
@@ -849,7 +849,7 @@
             try {
                 // Fetch issues from Supabase
                 const { data, error } = await supabaseClient
-                    .from('tax_issues')
+                    .from('hr_issues')
                     .select('*')
                     .order('issue_number', { ascending: true });
                 
@@ -1103,7 +1103,7 @@ function updatePagination(totalPages, totalItems) {
             try {
                 // Get the highest issue number to determine the next one
                 const { data: maxIssueNumber, error: maxError } = await supabaseClient
-                    .from('tax_issues')
+                    .from('hr_issues')
                     .select('issue_number')
                     .order('issue_number', { ascending: false })
                     .limit(1);
@@ -1129,7 +1129,7 @@ function updatePagination(totalPages, totalItems) {
                 
                 // Insert the new issue into Supabase
                 const { data, error } = await supabaseClient
-                    .from('tax_issues')
+                    .from('hr_issues')
                     .insert([newIssue])
                     .select();
                 
@@ -1179,7 +1179,7 @@ function updatePagination(totalPages, totalItems) {
         async function deleteIssue(issueId, issueNumber) {
             try {
                 const { error } = await supabaseClient
-                    .from('tax_issues')
+                    .from('hr_issues')
                     .delete()
                     .eq('id', issueId);
                 
@@ -1262,7 +1262,7 @@ function updatePagination(totalPages, totalItems) {
             try {
                 // Update the issue in Supabase
                 const { data, error } = await supabaseClient
-                    .from('tax_issues')
+                    .from('hr_issues')
                     .update({ 
                         answer: answer,
                         answer_attachment: answerAttachment,
@@ -1393,7 +1393,7 @@ function updatePagination(totalPages, totalItems) {
             
             // Set download attributes
             link.setAttribute('href', url);
-            link.setAttribute('download', `tax_issues_${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute('download', `hr_issues_${new Date().toISOString().split('T')[0]}.csv`);
             link.style.display = 'none';
             
             // Append to body, trigger click, and clean up
@@ -1534,6 +1534,7 @@ function updatePagination(totalPages, totalItems) {
 </script>
 </body>
 </html>
+
 
 
 
