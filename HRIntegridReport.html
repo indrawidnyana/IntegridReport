@@ -378,10 +378,10 @@
                 <input type="hidden" id="question" name="question" required>
             </div>
             <div>
-                <label for="questionBy" class="block text-gray-700 text-sm font-bold mb-2">Question By (PIC):</label>
+                <label for="questionBy" class="block text-gray-700 text-sm font-bold mb-2">Issue Type:</label>
                 <div class="custom-dropdown" id="picFormDropdown">
                     <button type="button" class="dropdown-btn">
-                        <span class="selected-text">Select PIC</span>
+                        <span class="selected-text">Select Type</span>
                         <span>▼</span>
                     </button>
                     <div class="dropdown-content">
@@ -580,7 +580,7 @@
             "ORTIS INVEST BALI", "RAVENALA", "ANNA HEELS", "KIRANA VIEW ESTATE", "NCS FUTURE PROJECT", "ART LIVING MANAGEMENT", "PT. AANOUKIS CREATIVE FASHION",
         "ULU LIVING DAYS", "PT SURFERS GUIDE"];
         
-        const picList = ["Eva", "Chika", "Novi","Anna", "Marcel", "Indra"];
+        const picList = ["PAYROLL", "BPJS KS & TK", "RECRUITMENT", "DISPUTE", "HR SETUP", "NEW CLIENT" ];
         
         // Status list for the status filter
         const statusList = ["All Statuses", "NEW / OPEN", "ANSWERED"];
@@ -924,7 +924,7 @@
                             <th class="px-4 py-2 border border-gray-300 text-left">Period</th>
                             <th class="px-4 py-2 border border-gray-300 text-left company-column">Company</th>
                             <th class="px-4 py-2 border border-gray-300 text-left question-column">Question</th>
-                            <th class="px-4 py-2 border border-gray-300 text-left">Question By (PIC)</th>
+                            <th class="px-4 py-2 border border-gray-300 text-left">Issue Type</th>
                             <th class="px-4 py-2 border border-gray-300 text-center">Attachment</th>
                             <th class="px-4 py-2 border border-gray-300 text-center">Status</th>
                             <th class="px-4 py-2 border border-gray-300 text-left answer-column">Answer</th>
@@ -1330,7 +1330,7 @@ function updatePagination(totalPages, totalItems) {
                         <p><span class="font-semibold">Period:</span> ${issue.period}</p>
                         <p><span class="font-semibold">Company:</span> ${issue.company}</p>
                         <p><span class="font-semibold">Question:</span> <div class="preserve-linebreaks" style="white-space: pre-wrap;">${issue.question}</div></p>
-                        <p><span class="font-semibold">Question By (PIC):</span> ${issue.question_by}</p>
+                        <p><span class="font-semibold">Issue Type:</span> ${issue.question_by}</p>
                         <p><span class="font-semibold">Question Attachment:</span> ${issue.attachment ? `<a href="${issue.attachment}" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline inline-block ml-2 text-sm">Here</a>` : 'No attachment'}</p>
                     </div>
                     <div class="mb-4 border-t border-gray-200 pt-4">
@@ -1358,7 +1358,7 @@ function updatePagination(totalPages, totalItems) {
                 'Period',
                 'Company',
                 'Question',
-                'Question By (PIC)',
+                'Issue By',
                 'Attachment',
                 'Status',
                 'Answer',
@@ -1536,6 +1536,7 @@ function updatePagination(totalPages, totalItems) {
 </script>
 </body>
 </html>
+
 
 
 
