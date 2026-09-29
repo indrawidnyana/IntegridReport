@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTEGRID x SIDECOURT - Padel Americano Tournament Manager</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Confetti JS for celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        sidecourt: {
+                            50: '#f2f5f3',
+                            100: '#e1e7e3',
+                            500: '#3B4A3F', // Moss Green
+                            600: '#2F3D33',
+                            700: '#232E26',
+                            800: '#1A231C',
+                            900: '#111713',
+                        },
+                        integrid: {
+                            50: '#f0f4f8',
+                            100: '#d9e2ec',
+                            500: '#4A607A', // Steel Blue
+                            600: '#3A4D63',
+                            700: '#2B3B4C',
+                        },
+                        courtgold: '#D4AF37'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.75; }
+        }
+        .animate-pulse-subtle { animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #111713; }
+        ::-webkit-scrollbar-thumb { background: #3B4A3F; border-radius: 3px; }
+    </style>
+</head>
+<body class="h-full bg-sidecourt-900 text-slate-100 font-sans antialiased flex flex-col justify-between" x-data="padelApp()">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-sidecourt-800/90 backdrop-blur-md border-b border-sidecourt-700/80 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Co-Branding Symbols & Names -->
+            <div class="flex items-center space-x-3 sm:space-x-4">
+                <div class="flex items-center space-x-3 bg-sidecourt-900/60 px-3.5 py-2.5 rounded-xl border border-sidecourt-700/50 shadow-inner">
+                    <!-- INTEGRID Consulting Symbol -->
+                    <div class="flex items-center space-x-1.5 text-integrid-100">
+                        <i class="fa-solid fa-briefcase text-sm"></i>
+                        <span class="font-extrabold text-xs tracking-wider">INTEGRID</span>
+                    </div>
+                    <span class="text-xs font-bold text-slate-400">×</span>
+                    <!-- SIDECOURT Padel Symbol -->
+                    <div class="flex items-center space-x-1.5 text-sidecourt-100">
+                        <i class="fa-solid fa-table-tennis-paddle-ball text-sm"></i>
+                        <span class="font-extrabold text-xs tracking-wider">SIDECOURT</span>
+                    </div>
+                </div>
+                <div class="hidden sm:block">
+                    <h1 class="font-extrabold text-sm sm:text-base text-white tracking-wide">Americano Individual Championship</h1>
+                    <p class="text-xs text-sidecourt-100/70">3 Courts • 14-16 Pemain • 8-10x Main • 2 Jam 15 Menit</p>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs (Desktop) -->
+            <nav class="hidden md:flex space-x-1 bg-sidecourt-900/80 p-1.5 rounded-xl border border-sidecourt-700">
+                <button @click="activeTab = 'setup'" :class="activeTab === 'setup' ? 'bg-sidecourt-500 text-white shadow-md' : 'text-slate-400 hover:text-white'" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200">
+                    <i class="fa-solid fa-users-gear mr-1.5"></i>1. Setup
+                </button>
+                <button @click="activeTab = 'group'" :class="activeTab === 'group' ? 'bg-sidecourt-500 text-white shadow-md' : 'text-slate-400 hover:text-white'" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200">
+                    <i class="fa-solid fa-trophy mr-1.5"></i>2. Babak Grup (Americano)
+                </button>
+                <button @click="activeTab = 'leaderboard'" :class="activeTab === 'leaderboard' ? 'bg-sidecourt-500 text-white shadow-md' : 'text-slate-400 hover:text-white'" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200">
+                    <i class="fa-solid fa-ranking-star mr-1.5"></i>3. Klasemen Individual
+                </button>
+                <button @click="activeTab = 'playoffs'" :class="activeTab === 'playoffs' ? 'bg-sidecourt-500 text-white shadow-md' : 'text-slate-400 hover:text-white'" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200">
+                    <i class="fa-solid fa-medal mr-1.5"></i>4. Semi & Final
+                </button>
+            </nav>
+
+            <!-- Mobile Menu Toggle -->
+            <div class="md:hidden flex items-center">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-slate-300 hover:text-white p-2">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Dropdown Menu -->
+        <div x-show="mobileMenuOpen" class="md:hidden bg-sidecourt-800 border-b border-sidecourt-700 px-4 pt-2 pb-4 space-y-1">
+            <button @click="activeTab = 'setup'; mobileMenuOpen = false" :class="activeTab === 'setup' ? 'bg-sidecourt-500 text-white' : 'text-slate-300'" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium">1. Setup & Aturan</button>
+            <button @click="activeTab = 'group'; mobileMenuOpen = false" :class="activeTab === 'group' ? 'bg-sidecourt-500 text-white' : 'text-slate-300'" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium">2. Babak Grup (Americano)</button>
+            <button @click="activeTab = 'leaderboard'; mobileMenuOpen = false" :class="activeTab === 'leaderboard' ? 'bg-sidecourt-500 text-white' : 'text-slate-300'" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium">3. Klasemen Individual</button>
+            <button @click="activeTab = 'playoffs'; mobileMenuOpen = false" :class="activeTab === 'playoffs' ? 'bg-sidecourt-500 text-white' : 'text-slate-300'" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium">4. Semi & Final</button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 overflow-y-auto">
+
+        <!-- TAB 1: SETUP & RULES -->
+        <div x-show="activeTab === 'setup'" class="space-y-6">
+            <div class="bg-sidecourt-800/90 border border-sidecourt-700 rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 border-b border-sidecourt-700 gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-briefcase text-integrid-100 text-xs"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider text-integrid-100">INTEGRID</span>
+                            <span class="text-slate-500">×</span>
+                            <i class="fa-solid fa-table-tennis-paddle-ball text-sidecourt-100 text-xs"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider text-sidecourt-100">SIDECOURT Special Event</span>
+                        </div>
+                        <h2 class="text-xl font-extrabold text-white mt-2 flex items-center">
+                            <i class="fa-solid fa-users-gear text-sidecourt-100 mr-3"></i>Setup Turnamen Americano Individual
+                        </h2>
+                        <p class="text-sm text-slate-300 mt-1">Kelola 14-16 pemain. Partner berotasi setiap game dan poin dihitung secara individu dengan kompensasi adil.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button @click="loadSamplePlayers()" class="px-4 py-2 bg-sidecourt-700 hover:bg-sidecourt-600 text-slate-200 text-xs font-semibold rounded-xl transition border border-sidecourt-600 flex items-center shadow">
+                            <i class="fa-solid fa-wand-magic-sparkles mr-2 text-courtgold"></i>Isi Data 16 Pemain
+                        </button>
+                        <button @click="resetAllData()" class="px-4 py-2 bg-red-950/60 hover:bg-red-900/80 text-red-300 text-xs font-semibold rounded-xl transition border border-red-800/60">
+                            <i class="fa-solid fa-rotate-right mr-2"></i>Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Info Cards -->
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-sidecourt-900/90 border border-sidecourt-700 rounded-xl p-5 space-y-4">
+                        <h3 class="font-bold text-white text-sm uppercase tracking-wider flex items-center text-sidecourt-100">
+                            <i class="fa-solid fa-shuffle mr-2"></i>Format Americano + Kompensasi Poin
+                        </h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Setiap game pasangan diacak adil. Jika waktu habis sebelum 10 ronde, Anda bisa mengakhiri grup lebih awal dan sistem otomatis menghitung kompensasi poin[cite: 4, 5, 6].
+                        </p>
+                    </div>
+
+                    <div class="bg-sidecourt-900/90 border border-sidecourt-700 rounded-xl p-5 space-y-3">
+                        <h3 class="font-bold text-white text-sm uppercase tracking-wider flex items-center text-courtgold">
+                            <i class="fa-solid fa-clock mr-2"></i>Aturan Waktu & Sistem Poin
+                        </h3>
+                        <ul class="text-xs text-slate-300 space-y-2 list-disc pl-4">
+                            <li><strong>Durasi Grup:</strong> 2 Jam 15 Menit (Maksimal 10 Ronde).</li>
+                            <li><strong>Sistem Poin:</strong> Menang = <strong class="text-courtgold">+3 Poin</strong>, Seri = <strong class="text-courtgold">+1 Poin</strong>, Kalah = <strong class="text-courtgold">0 Poin</strong>.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Input Player Form -->
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tambah Nama Pemain</label>
+                        <div class="flex gap-2">
+                            <input type="text" x-model="newPlayerName" @keydown.enter="addPlayer()" placeholder="Contoh: Rian Utama" class="flex-1 bg-sidecourt-900 border border-sidecourt-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-sidecourt-500">
+                            <button @click="addPlayer()" class="bg-sidecourt-500 hover:bg-sidecourt-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition shadow-lg flex items-center">
+                                <i class="fa-solid fa-user-plus mr-2"></i>Tambah
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Status Kapasitas (<span x-text="players.length"></span>/16)</label>
+                        <div class="bg-sidecourt-900 border border-sidecourt-700 rounded-xl px-4 py-3 flex items-center justify-between text-sm">
+                            <span class="text-slate-300">Pemain Terdaftar:</span>
+                            <span class="font-bold" :class="players.length >= 14 && players.length <= 16 ? 'text-sidecourt-100 font-bold' : 'text-amber-400'" x-text="players.length + ' Orang'"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Players Table & Start -->
+                <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-sidecourt-900/60 border border-sidecourt-700 rounded-xl p-4">
+                        <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-3 flex items-center justify-between">
+                            <span>Daftar Pemain (<span x-text="players.length"></span>)</span>
+                            <span class="text-xs text-slate-400 font-normal">Min 14, Max 16 pemain</span>
+                        </h3>
+                        <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                            <template x-for="(player, index) in players" :key="index">
+                                <div class="flex items-center justify-between bg-sidecourt-800 px-4 py-2.5 rounded-lg border border-sidecourt-700/50">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="w-6 h-6 rounded-full bg-sidecourt-900 text-slate-300 font-bold text-xs flex items-center justify-center" x-text="index + 1"></span>
+                                        <span class="text-sm font-medium text-slate-200" x-text="player"></span>
+                                    </div>
+                                    <button @click="removePlayer(index)" class="text-slate-500 hover:text-red-400 transition p-1">
+                                        <i class="fa-solid fa-trash-can text-sm"></i>
+                                    </button>
+                                </div>
+                            </template>
+                            <div x-show="players.length === 0" class="text-center py-8 text-slate-500 text-sm">
+                                Belum ada pemain. Tambahkan atau gunakan tombol "Isi Data 16 Pemain".
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-sidecourt-900/60 border border-sidecourt-700 rounded-xl p-4 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-3">Ringkasan Konfigurasi</h3>
+                            <div class="space-y-3 text-sm text-slate-300">
+                                <div class="bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700 flex justify-between items-center">
+                                    <span>Penyelenggara:</span>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="flex items-center space-x-1 text-integrid-100">
+                                            <i class="fa-solid fa-briefcase text-xs"></i>
+                                            <span class="font-bold text-xs">INTEGRID</span>
+                                        </div>
+                                        <span>×</span>
+                                        <div class="flex items-center space-x-1 text-sidecourt-100">
+                                            <i class="fa-solid fa-table-tennis-paddle-ball text-xs"></i>
+                                            <span class="font-bold text-xs">SIDECOURT</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700 flex justify-between">
+                                    <span>Durasi Sesi Babak Grup:</span>
+                                    <span class="font-bold text-white">2 Jam 15 Menit (Hingga 10 Ronde)</span>
+                                </div>
+                                <div class="bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700 flex justify-between">
+                                    <span>Sistem Penilaian:</span>
+                                    <span class="font-bold text-courtgold">Menang +3 | Seri +1 | Kalah 0 + Kompensasi</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-sidecourt-800">
+                            <button @click="goToGroupStage()" :disabled="players.length < 14" class="w-full bg-sidecourt-500 hover:bg-sidecourt-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl transition shadow-xl flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-arrow-right mr-2"></i>Mulai Turnamen (Babak Grup)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: GROUP STAGE (3 COURTS) -->
+        <div x-show="activeTab === 'group'" class="space-y-6">
+            <div class="bg-sidecourt-800/90 border border-sidecourt-700 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <div class="flex items-center space-x-3">
+                        <span class="px-3 py-1 rounded-full bg-sidecourt-500 text-white font-bold text-xs border border-sidecourt-400">Babak Grup (Americano)</span>
+                        <h2 class="text-xl font-bold text-white">Round <span x-text="currentRound"></span> / <span x-text="maxRounds"></span></h2>
+                    </div>
+                    <p class="text-sm text-slate-300 mt-1">Total 4 poin per match. Bisa diakhiri lebih awal jika waktu habis (misal ronde 7 atau 8).</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <button @click="startNewRound()" :disabled="roundInProgress || currentRound > maxRounds" class="bg-sidecourt-500 hover:bg-sidecourt-600 disabled:opacity-50 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition shadow-lg flex items-center">
+                        <i class="fa-solid fa-play mr-2"></i>Mulai Ronde Baru
+                    </button>
+                    <button @click="autoSimulateRound()" :disabled="!roundInProgress" class="bg-integrid-500 hover:bg-integrid-600 disabled:opacity-50 text-white px-3 py-2.5 rounded-xl font-semibold text-sm transition flex items-center">
+                        <i class="fa-solid fa-bolt mr-2"></i>Simulasi Skor
+                    </button>
+                    <button @click="finishRoundAndRotate()" :disabled="!roundInProgress" class="bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition shadow-lg flex items-center">
+                        <i class="fa-solid fa-rotate mr-2"></i>Selesaikan Ronde
+                    </button>
+                    <!-- Tombol Baru: Akhiri Grup Lebih Awal -->
+                    <button @click="endGroupStageEarly()" class="bg-red-700 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition shadow-lg flex items-center border border-red-500">
+                        <i class="fa-solid fa-flag-checkered mr-2"></i>Akhiri Grup & Cek Klasemen
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3 Courts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- COURT 1 -->
+                <div class="bg-gradient-to-b from-sidecourt-800 to-sidecourt-900 border-2 border-courtgold/60 rounded-2xl p-5 shadow-2xl relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute top-0 right-0 bg-courtgold text-sidecourt-950 font-extrabold text-xs px-4 py-1 rounded-bl-xl uppercase tracking-wider flex items-center shadow">
+                        <i class="fa-solid fa-crown mr-1.5"></i>Court 1
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <span class="w-8 h-8 rounded-lg bg-courtgold/20 text-courtgold flex items-center justify-center font-bold">1</span>
+                            <div>
+                                <h3 class="font-bold text-white text-base">Court Utama</h3>
+                                <p class="text-xs text-slate-400">Match 1 (Game 4 Poin)</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-sidecourt-900 border border-sidecourt-700 rounded-xl p-4 space-y-4 my-2">
+                            <div class="text-center pb-2 border-b border-sidecourt-800 text-xs font-semibold text-slate-400 uppercase tracking-widest">Skor (Total 4 Poin)</div>
+                            
+                            <div class="flex items-center justify-between bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700">
+                                <div>
+                                    <span class="text-xs font-bold text-courtgold uppercase">Tim A</span>
+                                    <div class="font-bold text-sm text-white" x-text="activeMatches[0].pairA ? activeMatches[0].pairA.name : 'Menunggu'"></div>
+                                </div>
+                                <div class="flex items-center space-x-2" x-show="activeMatches[0].pairA">
+                                    <button @click="updateScore(0, 'A', -1)" :disabled="!roundInProgress" class="w-8 h-8 rounded bg-sidecourt-700 hover:bg-sidecourt-600 text-white font-bold flex items-center justify-center">-</button>
+                                    <span class="w-8 text-center font-extrabold text-lg text-courtgold" x-text="activeMatches[0].scoreA"></span>
+                                    <button @click="updateScore(0, 'A', 1)" :disabled="!roundInProgress" class="w-8 h-8 rounded bg-sidecourt-500 hover:bg-sidecourt-600 text-white font-bold flex items-center justify-center">+</button>
+                                </div>
+                            </div>
+
+                            <div class="text-center text-xs font-bold text-slate-500 uppercase">VS</div>
+
+                            <div class="flex items-center justify-between bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700">
+                                <div>
+                                    <span class="text-xs font-bold text-slate-400 uppercase">Tim B</span>
+                                    <div class="font-bold text-sm text-white" x-text="activeMatches[0].pairB ? activeMatches[0].pairB.name : 'Menunggu'"></div>
+                                </div>
+                                <div class="flex items-center space-x-2" x-show="activeMatches[0].pairB">
+                                    <button @click="updateScore(0, 'B', -1)" :disabled="!roundInProgress" class="w-8 h-8 rounded bg-sidecourt-700 hover:bg-sidecourt-600 text-white font-bold flex items-center justify-center">-</button>
+                                    <span class="w-8 text-center font-extrabold text-lg text-slate-200" x-text="activeMatches[0].scoreB"></span>
+                                    <button @click="updateScore(0, 'B', 1)" :disabled="!roundInProgress" class="w-8 h-8 rounded bg-sidecourt-500 hover:bg-sidecourt-600 text-white font-bold flex items-center justify-center">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-sidecourt-800 text-xs text-slate-400 flex justify-between items-center">
+                        <span>Status</span>
+                        <span class="text-courtgold font-semibold" x-text="roundInProgress ? 'Sedang Main' : 'Menunggu Ronde'"></span>
+                    </div>
+                </div>
+
+                <!-- COURT 2 -->
+                <div class="bg-gradient-to-b from-sidecourt-800 to-sidecourt-900 border border-sidecourt-700 rounded-2xl p-5 shadow-xl relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute top-0 right-0 bg-sidecourt-700 text-slate-200 font-bold text-xs px-4 py-1 rounded-bl-xl uppercase tracking-wider shadow">
+                        Court 2
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <span class="w-8 h-8 rounded-lg bg-sidecourt-700 text-slate-300 flex items-center justify-center font-bold">2</span>
+                            <div>
+                                <h3 class="font-bold text-white text-base">Court Tengah</h3>
+                                <p class="text-xs text-slate-400">Match 2 (Game 4 Poin)</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-sidecourt-900 border border-sidecourt-700 rounded-xl p-4 space-y-4 my-2">
+                            <div class="text-center pb-2 border-b border-sidecourt-800 text-xs font-semibold text-slate-400 uppercase tracking-widest">Skor (Total 4 Poin)</div>
+                            
+                            <div class="flex items-center justify-between bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700">
+                                <div>
+                                    <span class="text-xs font-bold text-slate-400 uppercase">Tim A</span>
+                                    <div class="font-bold text-sm text-white" x-text="activeMatches[1].pairA ? activeMatches[1].pairA.name : 'Menunggu'"></div>
+                                </div>
+                                <div class="flex items-center space-x-2" x-show="activeMatches[1].pairA">
+                                    <button @click="updateScore(1, 'A', -1)" :disabled="!roundInProgress" class="w-8 h-8 rounded bg-sidecourt-700 hover:bg-sidecourt-600 text-white font-bold flex items-center justify-center">-</button>
+                                    <span class="w-8 text-center font-extrabold text-lg text-slate-200" x-text="activeMatches[1].scoreA"></span>
+                                    <button @click="updateScore(1, 'A', 1)" :disabled="!roundInProgress" class="w-8 h-8 rounded bg-sidecourt-500 hover:bg-sidecourt-600 text-white font-bold flex items-center justify-center">+</button>
+                                </div>
+                            </div>
+
+                            <div class="text-center text-xs font-bold text-slate-500 uppercase">VS</div>
+
+                            <div class="flex items-center justify-between bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700">
+                                <div>
+                                    <span class="text-xs font-bold text-slate-400 uppercase">Tim B</span>
+                                    <div class="font-bold text-sm text-white" x-text="activeMatches[1].pairB ? activeMatches[1].pairB.name : 'Menunggu'"></div>
+                                </div>
+                                <div class="flex items-center space-x-2" x-show="activeMatches[1].pairB">
+                                    <button @click="updateScore(1, 'B', -1)" :disabled="!roundInProgress" class="w-8 h-8 rounded bg-sidecourt-700 hover:bg-sidecourt-600 text-white font-bold flex items-center justify-center">-</button>
+                                    <span class="w-8 text-center font-extrabold text-lg text-slate-200" x-text="activeMatches[1].scoreB"></span>
+                                    <button @click="updateScore(1, 'B', 1)" :disabled="!roundInProgress" class="w-8 h-8 rounded bg-sidecourt-500 hover:bg-sidecourt-600 text-white font-bold flex items-center justify-center">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-sidecourt-800 text-xs text-slate-400 flex justify-between items-center">
+                        <span>Status</span>
+                        <span class="text-slate-400 font-semibold" x-text="roundInProgress ? 'Sedang Main' : 'Menunggu Ronde'"></span>
+                    </div>
+                </div>
+
+                <!-- COURT 3 -->
+                <div class="bg-gradient-to-b from-sidecourt-800 to-sidecourt-900 border border-sidecourt-700 rounded-2xl p-5 shadow-xl relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute top-0 right-0 bg-sidecourt-700 text-slate-200 font-bold text-xs px-4 py-1 rounded-bl-xl uppercase tracking-wider shadow">
+                        Court 3
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <span class="w-8 h-8 rounded-lg bg-sidecourt-700 text-slate-300 flex items-center justify-center font-bold">3</span>
+                            <div>
+                                <h3 class="font-bold text-white text-base">Court Bawah</h3>
+                                <p class="text-xs text-slate-400">Match 3 (Game 4 Poin)</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-sidecourt-900 border border-sidecourt-700 rounded-xl p-4 space-y-4 my-2">
+                            <div class="text-center pb-2 border-b border-sidecourt-800 text-xs font-semibold text-slate-400 uppercase tracking-widest">Skor (Total 4 Poin)</div>
+                            
+                            <div class="flex items-center justify-between bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700">
+                                <div>
+                                    <span class="text-xs font-bold text-slate-400 uppercase">Tim A</span>
+                                    <div class="font-bold text-sm text-white" x-text="activeMatches[2].pairA ? activeMatches[2].pairA.name : 'Bye'"></div>
+                                </div>
+                                <div class="flex items-center space-x-2" x-show="activeMatches[2].pairA">
+                                    <button @click="updateScore(2, 'A', -1)" :disabled="!roundInProgress" class="w-8 h-8 rounded bg-sidecourt-700 hover:bg-sidecourt-600 text-white font-bold flex items-center justify-center">-</button>
+                                    <span class="w-8 text-center font-extrabold text-lg text-slate-200" x-text="activeMatches[2].scoreA"></span>
+                                    <button @click="updateScore(2, 'A', 1)" :disabled="!roundInProgress" class="w-8 h-8 rounded bg-sidecourt-500 hover:bg-sidecourt-600 text-white font-bold flex items-center justify-center">+</button>
+                                </div>
+                            </div>
+
+                            <div class="text-center text-xs font-bold text-slate-500 uppercase">VS</div>
+
+                            <div class="flex items-center justify-between bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700">
+                                <div>
+                                    <span class="text-xs font-bold text-slate-400 uppercase">Tim B</span>
+                                    <div class="font-bold text-sm text-white" x-text="activeMatches[2].pairB ? activeMatches[2].pairB.name : 'Bye'"></div>
+                                </div>
+                                <div class="flex items-center space-x-2" x-show="activeMatches[2].pairB">
+                                    <button @click="updateScore(2, 'B', -1)" :disabled="!roundInProgress" class="w-8 h-8 rounded bg-sidecourt-700 hover:bg-sidecourt-600 text-white font-bold flex items-center justify-center">-</button>
+                                    <span class="w-8 text-center font-extrabold text-lg text-slate-200" x-text="activeMatches[2].scoreB"></span>
+                                    <button @click="updateScore(2, 'B', 1)" :disabled="!roundInProgress" class="w-8 h-8 rounded bg-sidecourt-500 hover:bg-sidecourt-600 text-white font-bold flex items-center justify-center">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-sidecourt-800 text-xs text-slate-400 flex justify-between items-center">
+                        <span>Status</span>
+                        <span class="text-slate-400 font-semibold" x-text="roundInProgress ? 'Sedang Main' : 'Menunggu Ronde'"></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Resting Queue -->
+            <div class="bg-sidecourt-800/90 border border-sidecourt-700 rounded-2xl p-5 shadow-xl">
+                <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-3 flex items-center">
+                    <i class="fa-solid fa-chair text-courtgold mr-2"></i>Antrean Istirahat Ronde Ini
+                </h3>
+                <div class="flex flex-wrap gap-3">
+                    <template x-for="(playerObj, qIdx) in restingPlayers" :key="qIdx">
+                        <div class="bg-sidecourt-900 border border-sidecourt-700 px-4 py-2 rounded-xl text-sm flex items-center space-x-2">
+                            <span class="w-5 h-5 rounded-full bg-sidecourt-800 text-slate-400 text-xs font-bold flex items-center justify-center" x-text="qIdx + 1"></span>
+                            <span class="font-medium text-slate-200" x-text="playerObj.name"></span>
+                        </div>
+                    </template>
+                    <div x-show="restingPlayers.length === 0" class="text-slate-500 text-sm italic">
+                        Semua 12 pemain aktif bermain di ronde ini.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: STANDINGS & LEADERBOARD -->
+        <div x-show="activeTab === 'leaderboard'" class="space-y-6">
+            <div class="bg-sidecourt-800/90 border border-sidecourt-700 rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 border-b border-sidecourt-700 gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-briefcase text-integrid-100 text-xs"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider text-integrid-100">INTEGRID</span>
+                            <span>×</span>
+                            <i class="fa-solid fa-table-tennis-paddle-ball text-sidecourt-100 text-xs"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider text-sidecourt-100">SIDECOURT</span>
+                        </div>
+                        <h2 class="text-xl font-extrabold text-white mt-2 flex items-center">
+                            <i class="fa-solid fa-ranking-star text-courtgold mr-3"></i>Klasemen Individual (Dengan Kompensasi Poin)
+                        </h2>
+                        <p class="text-sm text-slate-300 mt-1">Poin sudah termasuk kompensasi otomatis untuk pemain dengan jumlah main lebih sedikit. Top 8 lolos Semi-Final!</p>
+                    </div>
+                    <button @click="preparePlayoffs()" class="bg-sidecourt-500 hover:bg-sidecourt-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-lg flex items-center">
+                        <i class="fa-solid fa-medal mr-2"></i>Lanjutkan ke Semi-Final (Top 8)
+                    </button>
+                </div>
+
+                <!-- Leaderboard Table -->
+                <div class="mt-6 overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-sidecourt-700 text-xs font-semibold text-slate-400 uppercase tracking-wider bg-sidecourt-900/50">
+                                <th class="py-3 px-4">Rank</th>
+                                <th class="py-3 px-4">Nama Pemain</th>
+                                <th class="py-3 px-4 text-center">Main</th>
+                                <th class="py-3 px-4 text-center">Menang</th>
+                                <th class="py-3 px-4 text-center">Seri</th>
+                                <th class="py-3 px-4 text-center">Kalah</th>
+                                <th class="py-3 px-4 text-center">Poin Murni</th>
+                                <th class="py-3 px-4 text-center text-amber-300">Kompensasi</th>
+                                <th class="py-3 px-4 text-center">Total Poin Final</th>
+                                <th class="py-3 px-4 text-center">Status Top 8</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-sidecourt-800/80 text-sm">
+                            <template x-for="(player, idx) in leaderboard" :key="idx">
+                                <tr :class="idx < 8 ? 'bg-sidecourt-950/40 hover:bg-sidecourt-950/70' : 'hover:bg-sidecourt-900/30'" class="transition">
+                                    <td class="py-4 px-4 font-bold">
+                                        <div class="flex items-center space-x-2">
+                                            <span :class="idx === 0 ? 'bg-courtgold text-sidecourt-950' : idx === 1 ? 'bg-slate-300 text-sidecourt-950' : idx === 2 ? 'bg-amber-700 text-white' : 'bg-sidecourt-800 text-slate-300'" class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-extrabold" x-text="idx + 1"></span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4 font-bold text-white" x-text="player.name"></td>
+                                    <td class="py-4 px-4 text-center text-slate-300" x-text="player.played"></td>
+                                    <td class="py-4 px-4 text-center text-sidecourt-100 font-semibold" x-text="player.won"></td>
+                                    <td class="py-4 px-4 text-center text-amber-300" x-text="player.draw"></td>
+                                    <td class="py-4 px-4 text-center text-red-400" x-text="player.lost"></td>
+                                    <td class="py-4 px-4 text-center text-slate-300" x-text="player.points"></td>
+                                    <td class="py-4 px-4 text-center font-bold text-amber-300" x-text="'+' + player.compensation"></td>
+                                    <td class="py-4 px-4 text-center font-extrabold text-courtgold text-base" x-text="player.totalPoints"></td>
+                                    <td class="py-4 px-4 text-center">
+                                        <span x-show="idx < 8" class="px-2.5 py-1 rounded-full bg-sidecourt-500/80 text-white text-xs font-bold border border-sidecourt-400">Lolos SF</span>
+                                        <span x-show="idx >= 8" class="text-slate-500 text-xs">-</span>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: SEMI-FINALS & FINALS -->
+        <div x-show="activeTab === 'playoffs'" class="space-y-6">
+            <div class="bg-sidecourt-800/90 border border-sidecourt-700 rounded-2xl p-6 shadow-xl">
+                <div class="pb-6 border-b border-sidecourt-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-briefcase text-integrid-100 text-xs"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider text-integrid-100">INTEGRID</span>
+                            <span>×</span>
+                            <i class="fa-solid fa-table-tennis-paddle-ball text-sidecourt-100 text-xs"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider text-sidecourt-100">SIDECOURT</span>
+                        </div>
+                        <h2 class="text-xl font-extrabold text-white mt-2 flex items-center">
+                            <i class="fa-solid fa-medal text-courtgold mr-3"></i>Babak Playoff (45 Menit Terakhir)
+                        </h2>
+                        <p class="text-sm text-slate-300 mt-1">Top 8 Pemain dibagi menjadi 2 Pasangan Semi-Final. Pemenang bertarung di Grand Final!</p>
+                    </div>
+                    <button @click="generatePlayoffPairs()" class="bg-sidecourt-500 hover:bg-sidecourt-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-lg flex items-center">
+                        <i class="fa-solid fa-shuffle mr-2"></i>Generate Pasangan Semi-Final
+                    </button>
+                </div>
+
+                <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    
+                    <!-- SEMI FINALS -->
+                    <div class="space-y-6">
+                        <h3 class="text-base font-bold text-white uppercase tracking-wider flex items-center">
+                            <i class="fa-solid fa-trophy text-courtgold mr-2"></i>Semi-Final (2 Court)
+                        </h3>
+
+                        <!-- Semi Final 1 -->
+                        <div class="bg-sidecourt-900 border border-sidecourt-700 rounded-xl p-5 shadow-lg space-y-4">
+                            <div class="flex justify-between items-center text-xs font-semibold text-slate-400 uppercase">
+                                <span>Semi-Final 1 (Court 1)</span>
+                                <span class="text-sidecourt-100 font-bold">Pemenang ke Final</span>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700">
+                                    <span class="text-sm font-semibold text-white" x-text="sfMatch1.pairA ? (sfMatch1.pairA.p1 + ' & ' + sfMatch1.pairA.p2) : 'Belum Ditentukan'"></span>
+                                    <input type="number" x-model.number="sfMatch1.scoreA" class="w-16 bg-sidecourt-900 border border-sidecourt-700 rounded-lg px-3 py-1.5 text-center font-bold text-white focus:outline-none focus:border-sidecourt-500">
+                                </div>
+                                <div class="text-center text-xs font-bold text-slate-500">VS</div>
+                                <div class="flex items-center justify-between bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700">
+                                    <span class="text-sm font-semibold text-white" x-text="sfMatch1.pairB ? (sfMatch1.pairB.p1 + ' & ' + sfMatch1.pairB.p2) : 'Belum Ditentukan'"></span>
+                                    <input type="number" x-model.number="sfMatch1.scoreB" class="w-16 bg-sidecourt-900 border border-sidecourt-700 rounded-lg px-3 py-1.5 text-center font-bold text-white focus:outline-none focus:border-sidecourt-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Semi Final 2 -->
+                        <div class="bg-sidecourt-900 border border-sidecourt-700 rounded-xl p-5 shadow-lg space-y-4">
+                            <div class="flex justify-between items-center text-xs font-semibold text-slate-400 uppercase">
+                                <span>Semi-Final 2 (Court 2)</span>
+                                <span class="text-sidecourt-100 font-bold">Pemenang ke Final</span>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700">
+                                    <span class="text-sm font-semibold text-white" x-text="sfMatch2.pairA ? (sfMatch2.pairA.p1 + ' & ' + sfMatch2.pairA.p2) : 'Belum Ditentukan'"></span>
+                                    <input type="number" x-model.number="sfMatch2.scoreA" class="w-16 bg-sidecourt-900 border border-sidecourt-700 rounded-lg px-3 py-1.5 text-center font-bold text-white focus:outline-none focus:border-sidecourt-500">
+                                </div>
+                                <div class="text-center text-xs font-bold text-slate-500">VS</div>
+                                <div class="flex items-center justify-between bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700">
+                                    <span class="text-sm font-semibold text-white" x-text="sfMatch2.pairB ? (sfMatch2.pairB.p1 + ' & ' + sfMatch2.pairB.p2) : 'Belum Ditentukan'"></span>
+                                    <input type="number" x-model.number="sfMatch2.scoreB" class="w-16 bg-sidecourt-900 border border-sidecourt-700 rounded-lg px-3 py-1.5 text-center font-bold text-white focus:outline-none focus:border-sidecourt-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button @click="advanceToFinal()" class="w-full bg-sidecourt-500 hover:bg-sidecourt-600 text-white font-semibold py-3 rounded-xl transition shadow-lg text-sm">
+                            <i class="fa-solid fa-arrow-right mr-2"></i>Kunci Pemenang & Masuk ke Grand Final
+                        </button>
+                    </div>
+
+                    <!-- GRAND FINAL -->
+                    <div class="space-y-6">
+                        <h3 class="text-base font-bold text-white uppercase tracking-wider flex items-center">
+                            <i class="fa-solid fa-crown text-courtgold mr-2"></i>Grand Final Championship
+                        </h3>
+
+                        <div class="bg-gradient-to-b from-sidecourt-900 via-sidecourt-900 to-sidecourt-950 border-2 border-courtgold/70 rounded-2xl p-6 shadow-2xl relative overflow-hidden flex flex-col justify-between h-[420px]">
+                            <div class="absolute top-0 right-0 bg-courtgold text-sidecourt-950 font-extrabold text-xs px-4 py-1 rounded-bl-xl uppercase tracking-wider shadow">
+                                Court Utama (Final)
+                            </div>
+                            
+                            <div>
+                                <div class="text-center mb-6">
+                                    <div class="w-12 h-12 bg-courtgold/20 text-courtgold rounded-full flex items-center justify-center mx-auto mb-2 text-xl shadow-lg border border-courtgold/40">
+                                        <i class="fa-solid fa-trophy"></i>
+                                    </div>
+                                    <div class="flex items-center justify-center space-x-2 mb-1">
+                                        <i class="fa-solid fa-briefcase text-integrid-100 text-xs"></i>
+                                        <span class="font-bold text-xs text-integrid-100">INTEGRID</span>
+                                        <span>×</span>
+                                        <i class="fa-solid fa-table-tennis-paddle-ball text-sidecourt-100 text-xs"></i>
+                                        <span class="font-bold text-xs text-sidecourt-100">SIDECOURT</span>
+                                    </div>
+                                    <h4 class="font-bold text-white text-lg">Champion</h4>
+                                    <p class="text-xs text-slate-400">Pemenang Semi-Final 1 vs Pemenang Semi-Final 2</p>
+                                </div>
+
+                                <div class="space-y-3 bg-sidecourt-800 p-4 rounded-xl border border-sidecourt-700">
+                                    <div class="flex items-center justify-between bg-sidecourt-900 p-3 rounded-lg border border-sidecourt-700">
+                                        <span class="text-sm font-bold text-courtgold" x-text="finalMatch.pairA ? (finalMatch.pairA.p1 + ' & ' + finalMatch.pairA.p2) : 'Pemenang SF 1'"></span>
+                                        <input type="number" x-model.number="finalMatch.scoreA" class="w-16 bg-sidecourt-800 border border-sidecourt-700 rounded-lg px-3 py-1.5 text-center font-bold text-white focus:outline-none focus:border-courtgold">
+                                    </div>
+                                    <div class="text-center text-xs font-bold text-slate-500">VS</div>
+                                    <div class="flex items-center justify-between bg-sidecourt-900 p-3 rounded-lg border border-sidecourt-700">
+                                        <span class="text-sm font-bold text-courtgold" x-text="finalMatch.pairB ? (finalMatch.pairB.p1 + ' & ' + finalMatch.pairB.p2) : 'Pemenang SF 2'"></span>
+                                        <input type="number" x-model.number="finalMatch.scoreB" class="w-16 bg-sidecourt-800 border border-sidecourt-700 rounded-lg px-3 py-1.5 text-center font-bold text-white focus:outline-none focus:border-courtgold">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button @click="declareChampion()" class="w-full bg-gradient-to-r from-courtgold to-amber-600 hover:from-amber-400 hover:to-amber-500 text-sidecourt-950 font-extrabold py-3.5 rounded-xl transition shadow-xl text-sm flex items-center justify-center">
+                                <i class="fa-solid fa-award mr-2"></i>Umumkan Juara Utama!
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- CHAMPION CELEBRATION MODAL -->
+    <div x-show="showChampionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-sidecourt-950/80 backdrop-blur-sm p-4" x-cloak>
+        <div class="bg-sidecourt-900 border-2 border-courtgold rounded-3xl p-8 max-w-md w-full text-center shadow-2xl relative overflow-hidden animate-pulse-subtle">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-courtgold/10 rounded-full blur-2xl"></div>
+            <div class="w-20 h-20 bg-courtgold/20 text-courtgold rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-xl border border-courtgold/40">
+                <i class="fa-solid fa-crown"></i>
+            </div>
+            <div class="flex items-center justify-center space-x-2 mb-2">
+                <i class="fa-solid fa-briefcase text-integrid-100 text-xs"></i>
+                <span class="font-bold text-xs text-integrid-100">INTEGRID</span>
+                <span>×</span>
+                <i class="fa-solid fa-table-tennis-paddle-ball text-sidecourt-100 text-xs"></i>
+                <span class="font-bold text-xs text-sidecourt-100">SIDECOURT</span>
+            </div>
+            <h3 class="text-2xl font-black text-white mt-1" x-text="championPair ? (championPair.p1 + ' & ' + championPair.p2) : ''"></h3>
+            <p class="text-sm text-slate-300 mt-2">Selamat! Pasangan ini keluar sebagai Juara Pertama Turnamen Padel Eksekutif Anda!</p>
+            <button @click="showChampionModal = false" class="mt-6 w-full bg-sidecourt-500 hover:bg-sidecourt-600 text-white font-bold py-3 rounded-xl transition shadow-lg">
+                Tutup & Rayakan
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-sidecourt-800/60 border-t border-sidecourt-800 py-4 text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <div class="flex items-center space-x-1.5 text-integrid-100">
+            <i class="fa-solid fa-briefcase"></i>
+            <span class="font-bold">INTEGRID Professional Services</span>
+        </div>
+        <span class="text-slate-600">×</span>
+        <div class="flex items-center space-x-1.5 text-sidecourt-100">
+            <i class="fa-solid fa-table-tennis-paddle-ball"></i>
+            <span class="font-bold">SIDECOURT Padel Studio</span>
+        </div>
+    </footer>
+
+    <!-- AlpineJS -->
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script>
+        function padelApp() {
+            return {
+                activeTab: 'setup',
+                mobileMenuOpen: false,
+                newPlayerName: '',
+                players: [],
+                
+                currentRound: 1,
+                maxRounds: 10,
+                roundInProgress: false,
+                
+                activeMatches: [
+                    { pairA: null, pairB: null, scoreA: 2, scoreB: 2 },
+                    { pairA: null, pairB: null, scoreA: 2, scoreB: 2 },
+                    { pairA: null, pairB: null, scoreA: 2, scoreB: 2 }
+                ],
+                restingPlayers: [],
+                leaderboardObject: {},
+                leaderboard: [],
+
+                sfMatch1: { pairA: null, pairB: null, scoreA: 0, scoreB: 0 },
+                sfMatch2: { pairA: null, pairB: null, scoreA: 0, scoreB: 0 },
+                finalMatch: { pairA: null, pairB: null, scoreA: 0, scoreB: 0 },
+                showChampionModal: false,
+                championPair: null,
+
+                init() {
+                    const saved = localStorage.getItem('integrid_sidecourt_americano_v3');
+                    if (saved) {
+                        try {
+                            const data = JSON.parse(saved);
+                            this.players = data.players || [];
+                            this.currentRound = data.currentRound || 1;
+                            this.leaderboardObject = data.leaderboardObject || {};
+                            this.updateLeaderboardView();
+                            if (data.activeMatches) this.activeMatches = data.activeMatches;
+                            if (data.restingPlayers) this.restingPlayers = data.restingPlayers;
+                        } catch(e) {
+                            this.loadSamplePlayers();
+                        }
+                    } else {
+                        this.loadSamplePlayers();
+                    }
+                },
+
+                saveToStorage() {
+                    const data = {
+                        players: this.players,
+                        currentRound: this.currentRound,
+                        leaderboardObject: this.leaderboardObject,
+                        activeMatches: this.activeMatches,
+                        restingPlayers: this.restingPlayers
+                    };
+                    localStorage.setItem('integrid_sidecourt_americano_v3', JSON.stringify(data));
+                },
+
+                loadSamplePlayers() {
+                    this.players = [
+                        "Andi Pratama", "Budi Santoso", "Candra Wijaya", "Doni Setiawan",
+                        "Eko Prasetyo", "Fajar Nugraha", "Gilang Ramadhan", "Hadi Susanto",
+                        "Irfan Bachdim", "Joko Widodo", "Kurniawan D.", "Lukman Hakim",
+                        "Maulana Malik", "Nugroho Adi", "Oki Setiana", "Putra Utama"
+                    ];
+                    this.saveToStorage();
+                },
+
+                resetAllData() {
+                    if (confirm("Reset seluruh data turnamen Americano?")) {
+                        localStorage.removeItem('integrid_sidecourt_americano_v3');
+                        this.players = [];
+                        this.currentRound = 1;
+                        this.roundInProgress = false;
+                        this.activeMatches = [
+                            { pairA: null, pairB: null, scoreA: 2, scoreB: 2 },
+                            { pairA: null, pairB: null, scoreA: 2, scoreB: 2 },
+                            { pairA: null, pairB: null, scoreA: 2, scoreB: 2 }
+                        ];
+                        this.restingPlayers = [];
+                        this.leaderboard = [];
+                    }
+                },
+
+                addPlayer() {
+                    if (!this.newPlayerName.trim()) return;
+                    if (this.players.length >= 16) {
+                        alert("Maksimal 16 pemain tercapai!");
+                        return;
+                    }
+                    this.players.push(this.newPlayerName.trim());
+                    this.newPlayerName = '';
+                    this.saveToStorage();
+                },
+
+                removePlayer(index) {
+                    this.players.splice(index, 1);
+                    this.saveToStorage();
+                },
+
+                goToGroupStage() {
+                    if (this.players.length < 14) {
+                        alert("Minimal harus ada 14 pemain untuk memulai turnamen 3 court!");
+                        return;
+                    }
+                    this.initLeaderboard();
+                    this.setupRoundPairs();
+                    this.activeTab = 'group';
+                    this.saveToStorage();
+                },
+
+                initLeaderboard() {
+                    let map = {};
+                    this.players.forEach(p => {
+                        if (!this.leaderboardObject[p]) {
+                            map[p] = { name: p, played: 0, won: 0, draw: 0, lost: 0, points: 0 };
+                        } else {
+                            map[p] = this.leaderboardObject[p];
+                        }
+                    });
+                    this.leaderboardObject = map;
+                    this.updateLeaderboardView();
+                },
+
+                setupRoundPairs() {
+                    let list = [...this.players];
+                    for (let i = list.length - 1; i > 0; i--) {
+                        let j = Math.floor(Math.random() * (i + 1));
+                        [list[i], list[j]] = [list[j], list[i]];
+                    }
+
+                    let active12 = list.slice(0, 12);
+                    this.restingPlayers = list.slice(12).map(n => ({ name: n }));
+
+                    this.activeMatches[0] = {
+                        pairA: { name: active12[0] + ' & ' + active12[1], p1: active12[0], p2: active12[1] },
+                        pairB: { name: active12[2] + ' & ' + active12[3], p1: active12[2], p2: active12[3] },
+                        scoreA: 2, scoreB: 2
+                    };
+                    this.activeMatches[1] = {
+                        pairA: { name: active12[4] + ' & ' + active12[5], p1: active12[4], p2: active12[5] },
+                        pairB: { name: active12[6] + ' & ' + active12[7], p1: active12[6], p2: active12[7] },
+                        scoreA: 2, scoreB: 2
+                    };
+                    this.activeMatches[2] = {
+                        pairA: { name: active12[8] + ' & ' + active12[9], p1: active12[8], p2: active12[9] },
+                        pairB: { name: active12[10] + ' & ' + active12[11], p1: active12[10], p2: active12[11] },
+                        scoreA: 2, scoreB: 2
+                    };
+                    this.roundInProgress = true;
+                },
+
+                startNewRound() {
+                    if (this.currentRound > this.maxRounds) {
+                        alert("Babak grup 10 ronde selesai! Silakan buka Klasemen untuk melihat Top 8.");
+                        this.activeTab = 'leaderboard';
+                        return;
+                    }
+                    this.setupRoundPairs();
+                    this.saveToStorage();
+                },
+
+                updateScore(courtIdx, team, delta) {
+                    let m = this.activeMatches[courtIdx];
+                    if (team === 'A') {
+                        let newA = m.scoreA + delta;
+                        let newB = m.scoreB - delta;
+                        if (newA >= 0 && newB >= 0 && (newA + newB === 4)) {
+                            m.scoreA = newA;
+                            m.scoreB = newB;
+                        }
+                    } else {
+                        let newB = m.scoreB + delta;
+                        let newA = m.scoreA - delta;
+                        if (newA >= 0 && newB >= 0 && (newA + newB === 4)) {
+                            m.scoreA = newA;
+                            m.scoreB = newB;
+                        }
+                    }
+                },
+
+                autoSimulateRound() {
+                    for (let i = 0; i < 3; i++) {
+                        if (this.activeMatches[i].pairA && this.activeMatches[i].pairB) {
+                            let possibleScores = [[4,0], [3,1], [2,2], [1,3], [0,4]];
+                            let pick = possibleScores[Math.floor(Math.random() * possibleScores.length)];
+                            this.activeMatches[i].scoreA = pick[0];
+                            this.activeMatches[i].scoreB = pick[1];
+                        }
+                    }
+                },
+
+                finishRoundAndRotate() {
+                    for (let i = 0; i < 3; i++) {
+                        let m = this.activeMatches[i];
+                        if (m.pairA && m.pairB) {
+                            let sA = m.scoreA;
+                            let sB = m.scoreB;
+
+                            let playersA = [m.pairA.p1, m.pairA.p2].filter(Boolean);
+                            let playersB = [m.pairB.p1, m.pairB.p2].filter(Boolean);
+
+                            playersA.forEach(name => {
+                                let st = this.leaderboardObject[name];
+                                if(st) {
+                                    st.played++;
+                                    if (sA > sB) {
+                                        st.won++;
+                                        st.points += 3;
+                                    } else if (sA === sB) {
+                                        st.draw++;
+                                        st.points += 1;
+                                    } else {
+                                        st.lost++;
+                                    }
+                                }
+                            });
+
+                            playersB.forEach(name => {
+                                let st = this.leaderboardObject[name];
+                                if(st) {
+                                    st.played++;
+                                    if (sB > sA) {
+                                        st.won++;
+                                        st.points += 3;
+                                    } else if (sB === sA) {
+                                        st.draw++;
+                                        st.points += 1;
+                                    } else {
+                                        st.lost++;
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    this.updateLeaderboardView();
+                    this.roundInProgress = false;
+                    this.currentRound++;
+                    this.saveToStorage();
+
+                    if (this.currentRound > this.maxRounds) {
+                        alert("Babak Grup selesai! Silakan cek Klasemen Individual untuk menentukan Top 8 ke Semi-Final.");
+                        this.activeTab = 'leaderboard';
+                    } else {
+                        alert("Ronde " + (this.currentRound - 1) + " selesai! Klik 'Mulai Ronde Baru' untuk lanjut ke ronde berikutnya.");
+                    }
+                },
+
+                // Fungsi untuk mengakhiri babak grup lebih awal (misal di ronde 7 atau 8)
+                endGroupStageEarly() {
+                    if (confirm("Yakin ingin mengakhiri babak grup sekarang dan langsung mengakumulasi klasemen beserta kompensasi poin?")) {
+                        this.updateLeaderboardView();
+                        this.activeTab = 'leaderboard';
+                        alert("Babak grup dihentikan lebih awal. Klasemen final grup dengan kompensasi telah dikalkulasi.");
+                    }
+                },
+
+                updateLeaderboardView() {
+                    let arr = Object.values(this.leaderboardObject);
+                    
+                    // 1. Cari jumlah max 'played' di antara seluruh pemain saat ini
+                    let maxPlayed = arr.length > 0 ? Math.max(...arr.map(p => p.played)) : 0;
+
+                    // 2. Hitung kompensasi dan total poin final secara otomatis
+                    arr.forEach(p => {
+                        p.compensation = Math.max(0, maxPlayed - p.played);
+                        p.totalPoints = p.points + p.compensation;
+                    });
+
+                    // 3. Urutkan berdasarkan Total Poin Final (descending), lalu Menang (descending)
+                    arr.sort((a, b) => {
+                        if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+                        return b.won - a.won;
+                    });
+
+                    this.leaderboard = arr;
+                },
+
+                preparePlayoffs() {
+                    if (this.leaderboard.length < 8) {
+                        alert("Pemain kurang dari 8 untuk Semi-Final.");
+                        return;
+                    }
+                    this.activeTab = 'playoffs';
+                    this.generatePlayoffPairs();
+                },
+
+                generatePlayoffPairs() {
+                    let top8 = this.leaderboard.slice(0, 8).map(p => p.name);
+                    this.sfMatch1 = {
+                        pairA: { p1: top8[0], p2: top8[7] },
+                        pairB: { p1: top8[3], p2: top8[4] },
+                        scoreA: 0, scoreB: 0
+                    };
+                    this.sfMatch2 = {
+                        pairA: { p1: top8[1], p2: top8[6] },
+                        pairB: { p1: top8[2], p2: top8[5] },
+                        scoreA: 0, scoreB: 0
+                    };
+                },
+
+                advanceToFinal() {
+                    let winnerSF1 = this.sfMatch1.scoreA > this.sfMatch1.scoreB ? this.sfMatch1.pairA : this.sfMatch1.pairB;
+                    let winnerSF2 = this.sfMatch2.scoreA > this.sfMatch2.scoreB ? this.sfMatch2.pairA : this.sfMatch2.pairB;
+
+                    if (!winnerSF1 || !winnerSF2) {
+                        alert("Masukkan skor Semi-Final terlebih dahulu!");
+                        return;
+                    }
+
+                    this.finalMatch = {
+                        pairA: winnerSF1,
+                        pairB: winnerSF2,
+                        scoreA: 0,
+                        scoreB: 0
+                    };
+                    alert("Pemenang Semi-Final berhasil lolos ke Grand Final!");
+                },
+
+                declareChampion() {
+                    if (!this.finalMatch.pairA || !this.finalMatch.pairB) {
+                        alert("Pasangan Final belum lengkap!");
+                        return;
+                    }
+                    this.championPair = this.finalMatch.scoreA > this.finalMatch.scoreB ? this.finalMatch.pairA : this.finalMatch.pairB;
+                    this.showChampionModal = true;
+                    
+                    confetti({
+                        particleCount: 200,
+                        spread: 100,
+                        origin: { y: 0.5 }
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
