@@ -56,7 +56,7 @@
 <body class="h-full bg-sidecourt-900 text-slate-100 font-sans antialiased flex flex-col justify-between" x-data="padelApp()">
 
     <!-- HEADER / NAVBAR -->
-    <header class="bg-sidecourt-800/90 backdrop-blur-md border-b border-sidecourt-700/80 sticky top-0 z-50">
+    <header class="bg-sidecourt-800/95 backdrop-blur-md border-b border-sidecourt-700/80 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             
             <!-- Co-Branding Symbols & Names -->
@@ -76,7 +76,7 @@
                 </div>
                 <div class="hidden sm:block">
                     <h1 class="font-extrabold text-sm sm:text-base text-white tracking-wide">Americano Upper & Lower Championship</h1>
-                    <p class="text-xs text-sidecourt-100/70">3 Courts (Rotasi Pintar) • 18 Pemain (9 Upper & 9 Lower)</p>
+                    <p class="text-xs text-sidecourt-100/70">3 Courts (Rotasi Pintar) • 17 Pemain (8 Upper & 9 Lower)</p>
                 </div>
             </div>
 
@@ -129,13 +129,13 @@
                             <span class="text-xs font-bold uppercase tracking-wider text-sidecourt-100">SIDECOURT Special Event</span>
                         </div>
                         <h2 class="text-xl font-extrabold text-white mt-2 flex items-center">
-                            <i class="fa-solid fa-users-gear text-sidecourt-100 mr-3"></i>Setup Turnamen (18 Pemain: 9 Upper & 9 Lower)
+                            <i class="fa-solid fa-users-gear text-sidecourt-100 mr-3"></i>Setup Turnamen (17 Pemain: 8 Upper & 9 Lower)
                         </h2>
                         <p class="text-sm text-slate-300 mt-1">Sistem rotasi cerdas mengutamakan pemain dengan jumlah main paling sedikit agar poin kompensasi minimal.</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <button @click="loadSamplePlayers()" class="px-4 py-2 bg-sidecourt-700 hover:bg-sidecourt-600 text-slate-200 text-xs font-semibold rounded-xl transition border border-sidecourt-600 flex items-center shadow">
-                            <i class="fa-solid fa-wand-magic-sparkles mr-2 text-courtgold"></i>Isi 18 Pemain Otomatis
+                            <i class="fa-solid fa-wand-magic-sparkles mr-2 text-courtgold"></i>Isi 17 Pemain Otomatis
                         </button>
                         <button @click="resetAllData()" class="px-4 py-2 bg-red-950/60 hover:bg-red-900/80 text-red-300 text-xs font-semibold rounded-xl transition border border-red-800/60">
                             <i class="fa-solid fa-rotate-right mr-2"></i>Reset
@@ -159,8 +159,8 @@
                             <i class="fa-solid fa-clock mr-2"></i>Aturan Poin & Semifinal
                         </h3>
                         <ul class="text-xs text-slate-300 space-y-2 list-disc pl-4">
-                            <li><strong>Sistem Poin:</strong> Menang = <strong class="text-courtgold">+3</strong>, Seri = <strong class="text-courtgold">+1</strong>, Kalah = <strong class="text-courtgold">0</strong> + Kompensasi[cite: 8].</li>
-                            <li><strong>Semifinal:</strong> 1 Pemain Upper berpasangan dengan 1 Pemain Lower[cite: 8].</li>
+                            <li><strong>Sistem Poin:</strong> Menang = <strong class="text-courtgold">+3</strong>, Seri = <strong class="text-courtgold">+1</strong>, Kalah = <strong class="text-courtgold">0</strong> + Kompensasi.</li>
+                            <li><strong>Semifinal:</strong> 1 Pemain Upper berpasangan dengan 1 Pemain Lower.</li>
                         </ul>
                     </div>
                 </div>
@@ -177,10 +177,10 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Total Pemain (<span x-text="players.length"></span>/18)</label>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Total Pemain (<span x-text="players.length"></span>/17)</label>
                         <div class="bg-sidecourt-900 border border-sidecourt-700 rounded-xl px-4 py-3 flex items-center justify-between text-sm">
                             <span class="text-slate-300">Status:</span>
-                            <span class="font-bold" :class="players.length === 18 ? 'text-sidecourt-100' : 'text-amber-400'" x-text="players.length + ' / 18 Orang'"></span>
+                            <span class="font-bold" :class="players.length === 17 ? 'text-sidecourt-100' : 'text-amber-400'" x-text="players.length + ' / 17 Orang'"></span>
                         </div>
                     </div>
                 </div>
@@ -190,7 +190,7 @@
                     <div class="bg-sidecourt-900/60 border border-sidecourt-700 rounded-xl p-4 lg:col-span-2">
                         <h3 class="font-bold text-white text-sm uppercase tracking-wider mb-3 flex items-center justify-between">
                             <span>Daftar Pemain & Penentuan Grup (<span x-text="players.length"></span>)</span>
-                            <span class="text-xs text-slate-400 font-normal">Tentukan Upper (9) atau Lower (9)</span>
+                            <span class="text-xs text-slate-400 font-normal">Tentukan Upper (8) atau Lower (9)</span>
                         </h3>
                         <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
                             <template x-for="(player, index) in players" :key="index">
@@ -211,7 +211,7 @@
                                 </div>
                             </template>
                             <div x-show="players.length === 0" class="text-center py-8 text-slate-500 text-sm">
-                                Belum ada pemain. Gunakan tombol "Isi 18 Pemain Otomatis".
+                                Belum ada pemain. Gunakan tombol "Isi 17 Pemain Otomatis".
                             </div>
                         </div>
                     </div>
@@ -222,7 +222,7 @@
                             <div class="space-y-3 text-sm text-slate-300">
                                 <div class="bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700 flex justify-between">
                                     <span>Upper Group:</span>
-                                    <span class="font-bold text-courtgold" x-text="upperPlayersCount + ' Pemain (Target: 9)'"></span>
+                                    <span class="font-bold text-courtgold" x-text="upperPlayersCount + ' Pemain (Target: 8)'"></span>
                                 </div>
                                 <div class="bg-sidecourt-800 p-3 rounded-lg border border-sidecourt-700 flex justify-between">
                                     <span>Lower Group:</span>
@@ -231,7 +231,7 @@
                             </div>
                         </div>
                         <div class="mt-6 pt-4 border-t border-sidecourt-800">
-                            <button @click="goToGroupStage()" :disabled="players.length !== 18 || upperPlayersCount !== 9 || lowerPlayersCount !== 9" class="w-full bg-sidecourt-500 hover:bg-sidecourt-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl transition shadow-xl flex items-center justify-center text-sm">
+                            <button @click="goToGroupStage()" :disabled="players.length !== 17 || upperPlayersCount !== 8 || lowerPlayersCount !== 9" class="w-full bg-sidecourt-500 hover:bg-sidecourt-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl transition shadow-xl flex items-center justify-center text-sm">
                                 <i class="fa-solid fa-arrow-right mr-2"></i>Mulai Babak Grup
                             </button>
                         </div>
@@ -248,7 +248,7 @@
                         <span class="px-3 py-1 rounded-full bg-sidecourt-500 text-white font-bold text-xs border border-sidecourt-400">Penyisihan Upper & Lower</span>
                         <h2 class="text-xl font-bold text-white">Round <span x-text="currentRound"></span> / <span x-text="maxRounds"></span></h2>
                     </div>
-                    <p class="text-sm text-slate-300 mt-1">Court 2 bergiliran dipakai Upper / Lower setiap ronde dengan prioritas pemain main adil[cite: 8].</p>
+                    <p class="text-sm text-slate-300 mt-1">Court 2 bergiliran dipakai Upper / Lower setiap ronde dengan prioritas pemain main adil.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3">
                     <button @click="startNewRound()" :disabled="roundInProgress || currentRound > maxRounds" class="bg-sidecourt-500 hover:bg-sidecourt-600 disabled:opacity-50 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition shadow-lg flex items-center">
@@ -460,7 +460,7 @@
                         <h2 class="text-xl font-extrabold text-white mt-2 flex items-center">
                             <i class="fa-solid fa-ranking-star text-courtgold mr-3"></i>Klasemen Upper & Lower Group
                         </h2>
-                        <p class="text-sm text-slate-300 mt-1">Top 4 dari Upper dan Top 4 dari Lower berhak melaju ke Semifinal[cite: 8].</p>
+                        <p class="text-sm text-slate-300 mt-1">Top 4 dari Upper dan Top 4 dari Lower berhak melaju ke Semifinal.</p>
                     </div>
                     <button @click="preparePlayoffs()" class="bg-sidecourt-500 hover:bg-sidecourt-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-lg flex items-center">
                         <i class="fa-solid fa-medal mr-2"></i>Lanjut ke Semi-Final
@@ -573,7 +573,7 @@
                         <h2 class="text-xl font-extrabold text-white mt-2 flex items-center">
                             <i class="fa-solid fa-medal text-courtgold mr-3"></i>Babak Playoff (Kombinasi Upper & Lower)
                         </h2>
-                        <p class="text-sm text-slate-300 mt-1">1 Tim Semi-final terdiri dari 1 Pemain Upper dan 1 Pemain Lower. Pemenang menjadi Fixed Partner di Final[cite: 8].</p>
+                        <p class="text-sm text-slate-300 mt-1">1 Tim Semi-final terdiri dari 1 Pemain Upper dan 1 Pemain Lower. Pemenang menjadi Fixed Partner di Final.</p>
                     </div>
                     <button @click="generatePlayoffPairs()" class="bg-sidecourt-500 hover:bg-sidecourt-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-lg flex items-center">
                         <i class="fa-solid fa-shuffle mr-2"></i>Generate Pasangan Semifinal
@@ -585,7 +585,7 @@
                     <!-- SEMI FINALS -->
                     <div class="space-y-6">
                         <h3 class="text-base font-bold text-white uppercase tracking-wider flex items-center">
-                            <i class="fa-solid fa-trophy text-courtgold mr-2"></i>Semi-Final (1 Upper + 1 Lower per Tim)[cite: 8]
+                            <i class="fa-solid fa-trophy text-courtgold mr-2"></i>Semi-Final (1 Upper + 1 Lower per Tim)
                         </h3>
 
                         <!-- Semi Final 1 -->
@@ -629,14 +629,14 @@
                         </div>
 
                         <button @click="advanceToFinal()" class="w-full bg-sidecourt-500 hover:bg-sidecourt-600 text-white font-semibold py-3 rounded-xl transition shadow-lg text-sm">
-                            <i class="fa-solid fa-arrow-right mr-2"></i>Kunci Pemenang (Fixed Partner) & Masuk ke Final[cite: 8]
+                            <i class="fa-solid fa-arrow-right mr-2"></i>Kunci Pemenang (Fixed Partner) & Masuk ke Final
                         </button>
                     </div>
 
                     <!-- GRAND FINAL -->
                     <div class="space-y-6">
                         <h3 class="text-base font-bold text-white uppercase tracking-wider flex items-center">
-                            <i class="fa-solid fa-crown text-courtgold mr-2"></i>Grand Final Championship (Fixed Partner)[cite: 8]
+                            <i class="fa-solid fa-crown text-courtgold mr-2"></i>Grand Final Championship (Fixed Partner)
                         </h3>
 
                         <div class="bg-gradient-to-b from-sidecourt-900 via-sidecourt-900 to-sidecourt-950 border-2 border-courtgold/70 rounded-2xl p-6 shadow-2xl relative overflow-hidden flex flex-col justify-between h-[420px]">
@@ -650,7 +650,7 @@
                                         <i class="fa-solid fa-trophy"></i>
                                     </div>
                                     <h4 class="font-bold text-white text-lg">Grand Final</h4>
-                                    <p class="text-xs text-slate-400">Pemenang SF 1 vs Pemenang SF 2[cite: 8]</p>
+                                    <p class="text-xs text-slate-400">Pemenang SF 1 vs Pemenang SF 2</p>
                                 </div>
 
                                 <div class="space-y-3 bg-sidecourt-800 p-4 rounded-xl border border-sidecourt-700">
@@ -744,7 +744,7 @@
                 },
 
                 init() {
-                    const saved = localStorage.getItem('integrid_sidecourt_upper_lower_v4');
+                    const saved = localStorage.getItem('integrid_sidecourt_upper_lower_v5');
                     if (saved) {
                         try {
                             const data = JSON.parse(saved);
@@ -772,11 +772,11 @@
                         restingUpperPlayers: this.restingUpperPlayers,
                         restingLowerPlayers: this.restingLowerPlayers
                     };
-                    localStorage.setItem('integrid_sidecourt_upper_lower_v4', JSON.stringify(data));
+                    localStorage.setItem('integrid_sidecourt_upper_lower_v5', JSON.stringify(data));
                 },
 
                 loadSamplePlayers() {
-                    const upperNames = ["Andi Pratama", "Budi Santoso", "Candra Wijaya", "Doni Setiawan", "Eko Prasetyo", "Fajar Nugraha", "Gilang Ramadhan", "Hadi Susanto", "Irfan Bachdim"];
+                    const upperNames = ["Andi Pratama", "Budi Santoso", "Candra Wijaya", "Doni Setiawan", "Eko Prasetyo", "Fajar Nugraha", "Gilang Ramadhan", "Hadi Susanto"];
                     const lowerNames = ["Joko Widodo", "Kurniawan D.", "Lukman Hakim", "Maulana Malik", "Nugroho Adi", "Oki Setiana", "Putra Utama", "Rio Haryanto", "Samsul Arif"];
                     
                     this.players = [
@@ -788,7 +788,7 @@
 
                 resetAllData() {
                     if (confirm("Reset seluruh data turnamen Upper & Lower?")) {
-                        localStorage.removeItem('integrid_sidecourt_upper_lower_v4');
+                        localStorage.removeItem('integrid_sidecourt_upper_lower_v5');
                         this.players = [];
                         this.currentRound = 1;
                         this.roundInProgress = false;
@@ -806,11 +806,11 @@
 
                 addPlayer() {
                     if (!this.newPlayerName.trim()) return;
-                    if (this.players.length >= 18) {
-                        alert("Maksimal 18 pemain tercapai!");
+                    if (this.players.length >= 17) {
+                        alert("Maksimal 17 pemain tercapai!");
                         return;
                     }
-                    let tier = this.upperPlayersCount < 9 ? 'upper' : 'lower';
+                    let tier = this.upperPlayersCount < 8 ? 'upper' : 'lower';
                     this.players.push({ name: this.newPlayerName.trim(), tier: tier });
                     this.newPlayerName = '';
                     this.saveToStorage();
@@ -822,8 +822,8 @@
                 },
 
                 goToGroupStage() {
-                    if (this.upperPlayersCount !== 9 || this.lowerPlayersCount !== 9) {
-                        alert("Jumlah pemain harus tepat: 9 Upper Group dan 9 Lower Group!");
+                    if (this.upperPlayersCount !== 8 || this.lowerPlayersCount !== 9) {
+                        alert("Jumlah pemain harus tepat: 8 Upper Group dan 9 Lower Group!");
                         return;
                     }
                     this.initLeaderboard();
@@ -874,7 +874,7 @@
                     let isUpperOnCourt2 = (this.currentRound % 2 !== 0);
 
                     if (isUpperOnCourt2) {
-                        // Upper (9 pemain -> 8 aktif di C1 & C2, 1 istirahat dengan prioritas main sedikit)
+                        // Upper (8 pemain -> 8 aktif di C1 & C2, 0 istirahat karena pas untuk 2 court)
                         let upperRes = this.selectActivePlayers('upper', 8);
                         let activeUpper = upperRes.active;
                         this.restingUpperPlayers = upperRes.resting;
@@ -901,7 +901,7 @@
                             scoreA: 2, scoreB: 2
                         };
                     } else {
-                        // Upper (9 pemain -> 4 aktif di C1, 5 istirahat)
+                        // Upper (8 pemain -> 4 aktif di C1, 4 istirahat)
                         let upperRes = this.selectActivePlayers('upper', 4);
                         let activeUpper = upperRes.active;
                         this.restingUpperPlayers = upperRes.resting;
@@ -1087,7 +1087,7 @@
                         scoreA: 0,
                         scoreB: 0
                     };
-                    alert("Fixed Partner untuk Grand Final telah dikunci[cite: 8]!");
+                    alert("Fixed Partner untuk Grand Final telah dikunci!");
                 },
 
                 declareChampion() {
